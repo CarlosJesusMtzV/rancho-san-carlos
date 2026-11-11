@@ -26,7 +26,9 @@ Este archivo aplica a todo el repositorio. El trabajo se coordina desde esta ra�
 
 ## Coordinación y convenciones
 
-- Mantener el template agnóstico: las funcionalidades de negocio pertenecen a cada proyecto derivado. No agregar dependencias de dominio como requisito del arranque base.
+- Este repositorio es un proyecto derivado del template: su dominio es Rancho San Carlos y La Cremería San Carlos. Respetar las reglas de negocio de [specs/domain.spec.md](specs/domain.spec.md) (bovino solo carne, caprino cabritos y leche, quesería con leche de cabra) y el esquema de [specs/database.spec.md](specs/database.spec.md).
+- La skill del proyecto en `.claude/skills/rancho-san-carlos/` resume dominio y flujo para módulos nuevos.
+- No renombrar `TecNM.Api`, la base `tecnm_template` ni las variables `TECNM_*`: permiten seguir integrando cambios del template.
 - Cuando cambie una API, actualizar primero su contrato compartido y revisar DTOs backend, cliente frontend, errores y verificaciones afectados.
 - Cuando cambie persistencia, revisar conjuntamente SQL, mapeos EF Core, setup, Compose y documentación. Editar `database.sql` no migra volúmenes existentes.
 - Escribir identificadores, archivos y rutas en inglés; objetos PostgreSQL en `snake_case`; interfaz, errores y documentación en español de México.

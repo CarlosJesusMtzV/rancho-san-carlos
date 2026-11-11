@@ -10,7 +10,7 @@ Fuentes visuales obligatorias:
 - `frontend/src/modules/home/views/HomeView.vue`: composición mínima de inicio.
 - `frontend/src/shared/styles/global.css`: tokens y estilos comunes.
 
-Conservar identidad TecNM, soporte claro/oscuro y CSS nativo. No agregar dependencias para comportamiento cubierto por Vue, HTML o CSS.
+Conservar identidad Rancho San Carlos (tokens `--color-*`, `--brand-*`, `--font-*`), soporte claro/oscuro y CSS nativo. No agregar dependencias para comportamiento cubierto por Vue, HTML o CSS.
 
 ## Uso obligatorio
 
@@ -103,7 +103,7 @@ const name = ref('')
 - `MainLayout` vive en ruta padre pública. `RouterView` cambia únicamente contenido.
 - `UiShell` acepta `showHeader` y `showSidebar`; permite ambos, cualquiera o ninguno.
 - `UiHeader` y `UiSidebar` son independientes. Ambos aceptan `showTitle`, `showLogo`, `title`, `subtitle` y `logo`.
-- Logo predeterminado: `shared/assets/tecnm-isologo.svg`.
+- Logo predeterminado: `shared/assets/rancho-san-carlos-mark.svg`.
 - Navegación acepta enlaces `{ label, to }` y grupos `{ label, children }` sin destino propio.
 - `to` acepta cualquier `RouteLocationRaw` de Vue Router.
 - Desplegables funcionan con teclado; Escape cierra grupo. Estado lateral permanece entre páginas hijas.
@@ -118,7 +118,8 @@ const name = ref('')
 
 ## Integración actual
 
-- `HomeView`: bienvenida pública sin datos ni operaciones de negocio.
+- `HomeView`: panel en `/panel` sin datos ni operaciones de negocio.
+- `LandingView`: sitio público en `/`, con encabezado y pie propios fuera de `MainLayout`.
 - `MainLayout`: navegación persistente y tema.
 - `NotFoundView`: página 404 con navegación al inicio y selector de tema compartido.
 

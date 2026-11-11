@@ -5,6 +5,6 @@ export const homeRoutes: RouteRecordRaw[] = [
     path: '',
     name: 'home',
     component: () => import('./views/HomeView.vue'),
-    meta: { title: 'Inicio' },
+    meta: { title: 'Panel' },
   },
 ]

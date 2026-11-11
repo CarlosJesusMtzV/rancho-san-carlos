@@ -1,4 +1,32 @@
-# TecNM Campus Monclova — Plantilla base de proyectos
+# Rancho San Carlos y La Cremería San Carlos
+
+Sistema de gestión ganadera y quesera del negocio familiar en Castaños, Coahuila, construido sobre la plantilla `TecNM_Project_Template` (.NET 10, EF Core, PostgreSQL, Vue 3, TypeScript).
+
+- **Bovinos:** únicamente para carne; se venden vivos, becerros de unos 8 meses y 150 kg.
+- **Caprinos:** cabritos (en pie o en canal) y leche.
+- **Quesería:** queso canasta, panela y asadero exclusivamente de leche de cabra, trazables hasta su ordeña.
+
+| Ruta | Qué es |
+| --- | --- |
+| `/` | Sitio público: catálogo, pedido y trazabilidad de muestra |
+| `/panel` | Sistema de gestión (módulos por construir) |
+| `/api/health` | Health check del backend |
+
+Estado: esquema de base de datos, identidad visual, sitio público y panel inicial. Ningún módulo de backend está implementado. Seguimiento en [odd/tasks/rancho-san-carlos-migration.md](odd/tasks/rancho-san-carlos-migration.md).
+
+Documentos del proyecto: [dominio y reglas de negocio](specs/domain.spec.md), [base de datos](specs/database.spec.md), [sitio público](frontend/src/modules/landing/specs/landing.spec.md), [panel](frontend/src/modules/home/specs/home.spec.md) e [identidad visual](frontend/DESIGN.md).
+
+En Windows, sigue [primeros pasos](docs/primeros-pasos.md). Para arrancar con contenedores propios:
+
+```bash
+bash scripts/setup-dev.sh --project-name rancho-san-carlos
+```
+
+Lo que sigue es la documentación de la plantilla base, que continúa vigente salvo donde se indica.
+
+---
+
+## Plantilla base TecNM Campus Monclova
 
 Base agnóstica para aplicaciones web y microservicios institucionales. Incluye arquitectura modular, backend .NET 10 con EF Core/PostgreSQL, frontend Vue 3/TypeScript y componentes visuales TecNM.
 
@@ -32,9 +60,9 @@ El script guarda puertos y contraseña PostgreSQL en `.env`. `--project-name tec
 
 ## Base de datos de cada microservicio
 
-El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. El archivo incluido solo tiene comentarios: no crea tablas ni datos.
+El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 48 tablas, 6 vistas, 2 triggers sanitarios y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
 
-**Cada equipo debe completar ese SQL o modificar el mecanismo de inicialización** según su microservicio. El backend incluye un DbContext sin entidades para extenderlo con el modelo propio.
+El backend incluye un DbContext todavía sin entidades; se mapean conforme se construye cada módulo.
 
 El SQL se ejecuta únicamente al inicializar un volumen nuevo. Editarlo y repetir el setup no modifica una base existente: esos cambios requieren la estrategia de migraciones elegida por el proyecto. El volumen `postgres_data` conserva los datos entre reinicios.
 

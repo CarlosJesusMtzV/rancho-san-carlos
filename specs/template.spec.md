@@ -1,5 +1,7 @@
 # Template agnóstico TecNM
 
+> Proyecto derivado: este repositorio ya define su dominio en [`domain.spec.md`](domain.spec.md) y su esquema en [`database.spec.md`](database.spec.md). Lo siguiente describe la base heredada; los criterios 1 y 4 cambian: `/` es el sitio público, el inicio del sistema está en `/panel` y `database.sql` crea las tablas del rancho.
+
 ## Alcance
 
 Base técnica para aplicaciones y microservicios: .NET 10, EF Core, PostgreSQL, Vue 3, TypeScript y componentes institucionales. Cada proyecto define su dominio.

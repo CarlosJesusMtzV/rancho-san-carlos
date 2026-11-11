@@ -1,4 +1,54 @@
-# Sistema de Diseño Institucional: Tecnológico Nacional de México (TecNM)
+# Sistema de Diseño: Rancho San Carlos y La Cremería San Carlos
+
+> **Vigente:** la identidad de este proyecto es la de Rancho San Carlos. Esta primera sección manda sobre el resto del documento. Las secciones 1 a 7 describen el sistema TecNM heredado del template: su estructura (roles de token, geometría, componentes, espaciado) sigue aplicando, pero sus colores y nombres ya no. Reescribirlas está pendiente en `odd/tasks/rancho-san-carlos-migration.md`.
+
+## 0. Identidad Rancho San Carlos
+
+### Paleta de marca
+
+| Nombre | Hex | Pantone | Token | Uso |
+| --- | --- | --- | --- | --- |
+| Negro Herradura | `#1A1918` | Black C | `--brand-ink`, `--color-primary` (claro) | Texto, botones primarios, encabezado y pie |
+| Blanco Cuajada | `#F7F4EC` | 7527 U | `--brand-cream`, `--color-bg-main` (claro) | Fondo principal |
+| Terracota Sierra | `#B05A3E` | 7523 U | `--brand-terracota`, `--color-primary` (oscuro) | División bovina, foco |
+| Ocre Canasta | `#D19A36` | 7556 U | `--brand-ocre`, `--color-accent` | Quesería, acentos |
+| Verde Mezquite | `#5E6B3E` | 7749 U | `--brand-mezquite` | División caprina |
+| Gris Caliza | `#444B50` | 432 U | `--brand-caliza`, `--color-text-secondary` | Texto secundario, interfaz |
+| Cobre Paila | `#B87333` | 876 C | `--brand-cobre` | Acabado especial |
+
+En tema oscuro los tokens `--brand-*` de división se aclaran (`#D07A5C`, `#E0B45C`, `#9CAB74`) para mantener contraste sobre fondo `#141312`. Los valores exactos de cada token están en `src/shared/styles/global.css`.
+
+### Color por división
+
+| División | Token | Dónde |
+| --- | --- | --- |
+| Quesería | `--brand-ocre` | Tarjetas, pestañas y fichas de queso |
+| Caprina | `--brand-mezquite` | Cabritos, ordeña |
+| Bovina | `--brand-terracota` | Becerros |
+
+El color nunca es la única señal: cada división lleva además su etiqueta de texto.
+
+### Tipografía
+
+| Rol | Fuente | Token |
+| --- | --- | --- |
+| Identidad (logotipo, títulos de tarjeta) | Cinzel 600/700 | `--font-identity` |
+| Titulares | Playfair Display 600/700 | `--font-display` |
+| Cuerpo e interfaz | Plus Jakarta Sans 300 a 700 | `--font-body` |
+| Acento manuscrito | Cormorant Garamond itálica | `--font-accent` |
+
+Se cargan desde Google Fonts en `frontend/index.html`, con Georgia y fuentes del sistema como respaldo.
+
+### Patrones y piezas
+
+- **Canasta:** rejilla diagonal en ocre a baja opacidad para fondos claros (`.lp-pattern-basket`).
+- **Semidesierto:** punteado sobre Negro Herradura para secciones oscuras (`.lp-pattern-desert`).
+- **Logotipo:** horizontal en el sitio público (`BrandLogo.vue`); isotipo «SC» en el panel (`shared/assets/rancho-san-carlos-mark.svg`).
+- **Sello circular y etiqueta:** representan piezas impresas y usan colores fijos en ambos temas.
+
+---
+
+# Referencia heredada: Sistema de Diseño Institucional TecNM
 **Identificador de Proyecto:** `tecnm-institutional-design-system`
 **Versión de Especificación:** 1.0.0
 **Activo de Origen:** `colors.css` / Guía de Identidad Institucional Universitaria

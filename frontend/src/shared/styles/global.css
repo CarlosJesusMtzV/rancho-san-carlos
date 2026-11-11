@@ -1,32 +1,32 @@
 :root {
   color-scheme: light;
-  --color-primary:#1B396A;
-  --color-primary-dark:#0F2548;
-  --color-primary-hover:#244B88;
-  --color-primary-subtle:#EBF3FF;
-  --color-primary-tint:#E8EDF5;
-  --color-accent:#C5A059;
-  --color-accent-light:#F7F3E9;
-  --color-bg-main:#F4F6F9;
-  --color-bg-light:#F8FAFC;
+  --color-primary:#1A1918;
+  --color-primary-dark:#0F0E0D;
+  --color-primary-hover:#33302D;
+  --color-primary-subtle:#EFECE3;
+  --color-primary-tint:#E9E4D6;
+  --color-accent:#D19A36;
+  --color-accent-light:#F8EFD9;
+  --color-bg-main:#F7F4EC;
+  --color-bg-light:#EFECE3;
   --color-surface-white:#FFFFFF;
   --color-white:#FFFFFF;
-  --color-border:#E2E8F0;
-  --color-border-light:#F1F5F9;
-  --color-border-medium:#CBD5E1;
-  --color-border-focus:#1B396A;
-  --color-gray-50:#F8FAFC;
-  --color-gray-100:#F1F5F9;
-  --color-gray-200:#E2E8F0;
-  --color-gray-300:#CBD5E1;
-  --color-gray-400:#94A3B8;
-  --color-gray-500:#64748B;
-  --color-gray-600:#475569;
-  --color-gray-700:#334155;
-  --color-gray-800:#1E293B;
-  --color-text-primary:#1E293B;
-  --color-text-secondary:#64748B;
-  --color-text-muted:#94A3B8;
+  --color-border:#E3DDCF;
+  --color-border-light:#EEE9DD;
+  --color-border-medium:#CFC7B5;
+  --color-border-focus:#B05A3E;
+  --color-gray-50:#FAF8F3;
+  --color-gray-100:#F1EEE6;
+  --color-gray-200:#E3DDCF;
+  --color-gray-300:#CFC7B5;
+  --color-gray-400:#9C968A;
+  --color-gray-500:#6B6A66;
+  --color-gray-600:#444B50;
+  --color-gray-700:#2F3336;
+  --color-gray-800:#1A1918;
+  --color-text-primary:#1A1918;
+  --color-text-secondary:#444B50;
+  --color-text-muted:#77756F;
   --color-text-inverse:#FFFFFF;
   --color-success:#22C55E;
   --color-success-strong:#15803D;
@@ -58,50 +58,61 @@
   --color-purple-bg:#EDE9FE;
   --color-purple-text:#5B21B6;
   --color-purple-border:#DDD6FE;
-  --color-header-bg:#1B396A;
-  --color-footer-bg:#0F2548;
+  --color-header-bg:#1A1918;
+  --color-footer-bg:#1A1918;
   --input-bg:#FFFFFF;
-  --input-border:#CBD5E1;
-  --secondary-hover:#F1F5F9;
+  --input-border:#CFC7B5;
+  --secondary-hover:#F1EEE6;
   --destructive-text:#DC2626;
-  --card-shadow:0 1px 3px rgba(15,37,72,.05),0 1px 2px rgba(15,37,72,.03);
+  --card-shadow:0 1px 3px rgba(26,25,24,.05),0 1px 2px rgba(26,25,24,.03);
   --floating-bg:#FFFFFF;
-  --floating-border:#E2E8F0;
-  --floating-shadow:0 10px 15px -3px rgba(15,37,72,.08),0 4px 6px -2px rgba(15,37,72,.04);
+  --floating-border:#E3DDCF;
+  --floating-shadow:0 10px 15px -3px rgba(26,25,24,.08),0 4px 6px -2px rgba(26,25,24,.04);
   --dialog-bg:#FFFFFF;
-  --dialog-border:#E2E8F0;
-  --dialog-shadow:0 20px 25px -5px rgba(15,37,72,.15);
+  --dialog-border:#E3DDCF;
+  --dialog-shadow:0 20px 25px -5px rgba(26,25,24,.15);
+  --brand-ink:#1A1918;
+  --brand-cream:#F7F4EC;
+  --brand-terracota:#B05A3E;
+  --brand-ocre:#D19A36;
+  --brand-mezquite:#5E6B3E;
+  --brand-caliza:#444B50;
+  --brand-cobre:#B87333;
+  --font-identity:"Cinzel",Georgia,serif;
+  --font-display:"Playfair Display",Georgia,serif;
+  --font-accent:"Cormorant Garamond",Georgia,serif;
+  --font-body:"Plus Jakarta Sans",Inter,Roboto,system-ui,sans-serif;
 }
 
 [data-theme="dark"] {
   color-scheme:dark;
-  --color-primary:#2B5EA7;
-  --color-primary-dark:#13233F;
-  --color-primary-hover:#3B74C4;
-  --color-primary-subtle:#172B4D;
-  --color-primary-tint:#1B2E4E;
-  --color-accent:#D4B06A;
-  --color-accent-light:#2A2418;
-  --color-bg-main:#0B111E;
-  --color-bg-light:#101A2C;
-  --color-surface-white:#141E33;
-  --color-border:#1E2C44;
-  --color-border-light:#162338;
-  --color-border-medium:#2E3F5E;
-  --color-border-focus:#60A5FA;
-  --color-gray-50:#0D1524;
-  --color-gray-100:#131E31;
-  --color-gray-200:#1C2B44;
-  --color-gray-300:#2A3B5A;
-  --color-gray-400:#64748B;
-  --color-gray-500:#94A3B8;
-  --color-gray-600:#CBD5E1;
-  --color-gray-700:#E2E8F0;
-  --color-gray-800:#F8FAFC;
-  --color-text-primary:#F8FAFC;
-  --color-text-secondary:#94A3B8;
-  --color-text-muted:#64748B;
-  --color-text-inverse:#0B111E;
+  --color-primary:#B05A3E;
+  --color-primary-dark:#2A1A14;
+  --color-primary-hover:#C46A4C;
+  --color-primary-subtle:#2E211B;
+  --color-primary-tint:#33261F;
+  --color-accent:#E0B45C;
+  --color-accent-light:#2B2416;
+  --color-bg-main:#141312;
+  --color-bg-light:#1A1918;
+  --color-surface-white:#22201E;
+  --color-border:#33302C;
+  --color-border-light:#2A2825;
+  --color-border-medium:#45413B;
+  --color-border-focus:#E0B45C;
+  --color-gray-50:#181716;
+  --color-gray-100:#1F1D1B;
+  --color-gray-200:#2C2926;
+  --color-gray-300:#3D3934;
+  --color-gray-400:#77756F;
+  --color-gray-500:#9C968A;
+  --color-gray-600:#CFC7B5;
+  --color-gray-700:#E3DDCF;
+  --color-gray-800:#F7F4EC;
+  --color-text-primary:#F7F4EC;
+  --color-text-secondary:#B9B3A6;
+  --color-text-muted:#8A857B;
+  --color-text-inverse:#141312;
   --color-success:#4ADE80;
   --color-success-strong:#16A34A;
   --color-success-hover:#22C55E;
@@ -132,19 +143,24 @@
   --color-purple-bg:#221340;
   --color-purple-text:#DDD6FE;
   --color-purple-border:#5B21B6;
-  --color-header-bg:#0F1829;
-  --color-footer-bg:#080D18;
-  --input-bg:#101A2C;
-  --input-border:#2A3B5A;
-  --secondary-hover:#1B2B48;
+  --color-header-bg:#0F0E0D;
+  --color-footer-bg:#0B0A0A;
+  --input-bg:#1A1918;
+  --input-border:#3D3934;
+  --secondary-hover:#2C2926;
   --destructive-text:#F87171;
   --card-shadow:none;
-  --floating-bg:#1A2844;
-  --floating-border:#2A3E63;
+  --floating-bg:#262320;
+  --floating-border:#3D3934;
   --floating-shadow:0 12px 24px rgba(0,0,0,.45);
-  --dialog-bg:#1E2F50;
-  --dialog-border:#334C79;
+  --dialog-bg:#2A2724;
+  --dialog-border:#45413B;
   --dialog-shadow:none;
+  --brand-terracota:#D07A5C;
+  --brand-ocre:#E0B45C;
+  --brand-mezquite:#9CAB74;
+  --brand-caliza:#B9B3A6;
+  --brand-cobre:#D4935A;
 }
 
 * {
@@ -155,7 +171,7 @@ body {
   margin:0;
   background:var(--color-bg-main);
   color:var(--color-text-primary);
-  font:16px/1.6 Inter,"Plus Jakarta Sans",Roboto,system-ui,sans-serif;
+  font:16px/1.6 var(--font-body);
 }
 
 button,input,select,textarea {
@@ -189,6 +205,7 @@ h1,h2,h3,p {
 }
 
 h1 {
+  font-family:var(--font-display);
   font-size:clamp(28px,3.2vw,40px);
   line-height:1.2;
   letter-spacing:-.025em;
@@ -228,6 +245,8 @@ small,.caption {
 }
 
 .brand {
+  font-family:var(--font-identity);
+  letter-spacing:.08em;
   display:flex;
   gap:12px;
   align-items:center;
@@ -238,7 +257,7 @@ small,.caption {
 
 .brand small {
   display:block;
-  color:#CBD5E1;
+  color:#D8D2C4;
   font-size:12px;
   font-weight:400;
   margin-top:4px;
@@ -847,7 +866,7 @@ dialog p {
 
 .ui-footer {
   background:var(--color-footer-bg);
-  color:#CBD5E1;
+  color:#D8D2C4;
   padding:24px 32px;
   display:flex;
   justify-content:space-between;

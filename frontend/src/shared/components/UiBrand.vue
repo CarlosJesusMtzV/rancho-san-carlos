@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import tecnmLogo from '../assets/tecnm-isologo.svg'
+import brandLogo from '../assets/rancho-san-carlos-mark.svg'
 import type { BrandOptions } from './navigation'
 
 withDefaults(defineProps<BrandOptions>(), {
-  title: 'TecNM',
-  subtitle: 'Campus Monclova',
+  title: 'San Carlos',
+  subtitle: 'Ganadería y quesería',
   showTitle: true,
   showLogo: true,
-  logo: tecnmLogo,
+  logo: brandLogo,
 })
 </script>
 

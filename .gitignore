@@ -2,6 +2,8 @@
 # AI Skills & Agents
 # ==========================================
 .agents/
+# Skill de terceros instalada localmente (ver CONTRIBUTING.md#skill-grilling).
+.claude/skills/grilling/
 skills-lock.json
 .gemini/
 .aws
@@ -68,3 +70,16 @@ Thumbs.db
 
 # Python helper caches
 __pycache__/
+
+# Llaves, certificados y respaldos: nunca se versionan.
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+*.dump
+*.backup
+*.bak
+*.sql.gz
+backups/
+respaldos/

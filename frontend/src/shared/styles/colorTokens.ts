@@ -59,5 +59,12 @@ export const colorTokens = [
   "--color-purple-text",
   "--color-purple-border",
   "--color-header-bg",
-  "--color-footer-bg"
+  "--color-footer-bg",
+  "--brand-ink",
+  "--brand-cream",
+  "--brand-terracota",
+  "--brand-ocre",
+  "--brand-mezquite",
+  "--brand-caliza",
+  "--brand-cobre"
 ] as const

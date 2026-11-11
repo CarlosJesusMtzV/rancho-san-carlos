@@ -4,14 +4,17 @@ import type { BrandOptions, NavigationItem } from '../../shared/components/navig
 export const mainLayoutConfig = {
   showHeader: false,
   showSidebar: true,
-  header: { title: 'TecNM', subtitle: 'Campus Monclova', showTitle: true, showLogo: false } satisfies BrandOptions,
-  sidebar: { title: 'TecNM', subtitle: 'Campus Monclova', showTitle: true, showLogo: false } satisfies BrandOptions,
+  header: { title: 'San Carlos', subtitle: 'Ganadería y quesería', showTitle: true, showLogo: true } satisfies BrandOptions,
+  sidebar: { title: 'San Carlos', subtitle: 'Ganadería y quesería', showTitle: true, showLogo: true } satisfies BrandOptions,
 }
 
+// Agregar aquí cada módulo cuando su ruta exista; no enlazar vistas pendientes.
 export const headerNavigation: NavigationItem[] = [
-  { label: 'Inicio', to: '/' },
+  { label: 'Panel', to: '/panel' },
+  { label: 'Sitio público', to: '/' },
 ]
 
 export const sidebarNavigation: NavigationItem[] = [
-  { label: 'Inicio', to: '/' },
+  { label: 'Panel', to: '/panel' },
+  { label: 'Sitio público', to: '/' },
 ]

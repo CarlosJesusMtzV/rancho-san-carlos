@@ -15,14 +15,14 @@ const { dark } = useTheme()
       </UiHeader>
     </template>
     <template #sidebar>
-      <UiSidebar v-bind="mainLayoutConfig.sidebar" :items="sidebarNavigation" note="Identidad institucional. Excelencia técnica. Solidez académica.">
+      <UiSidebar v-bind="mainLayoutConfig.sidebar" :items="sidebarNavigation" note="Bovinos para carne. Caprinos para cabritos y leche. Quesería artesanal.">
         <UiToggle v-if="!mainLayoutConfig.showHeader" v-model="dark" type="switch" label="Modo oscuro" />
       </UiSidebar>
     </template>
     <RouterView />
     <template #footer>
-      <span>Tecnológico Nacional de México</span>
-      <span>Campus Monclova</span>
+      <span>Rancho San Carlos y La Cremería San Carlos · Castaños, Coahuila</span>
+      <span>Proyecto académico TecNM Campus Monclova</span>
     </template>
   </UiShell>
 </template>

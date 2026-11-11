@@ -23,7 +23,7 @@
 - Buscar y reutilizar componentes de `src/shared/components/` antes de crear controles o CSS locales. Extender su API cuando la necesidad sea compartida por varias vistas.
 - Evitar duplicar estructura o estilos de componentes existentes; mantener lógica exclusiva en el módulo correspondiente.
 - Usar `UiBasePage` como raíz del contenido de las páginas dentro del layout, con `fluid=true` por defecto. Usar modo centrado cuando lo requiera la spec o el contenido.
-- Usar CSS nativo y tokens semánticos; conservar coherencia visual TecNM y soporte claro/oscuro.
+- Usar CSS nativo y tokens semánticos; conservar coherencia visual de Rancho San Carlos y soporte claro/oscuro.
 - Mantener semántica HTML, etiquetas visibles, navegación por teclado, foco visible y diseño responsive desde 375 px. Respetar `prefers-reduced-motion`.
 - Prevenir envíos duplicados: bloquear reentrancia en operaciones asíncronas mutativas y deshabilitar controles mientras se procesan.
 - No agregar gestión global de estado ni dependencias sin uso directo que lo justifique.

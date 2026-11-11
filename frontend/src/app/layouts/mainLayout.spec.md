@@ -15,7 +15,7 @@ Persistente significa conservar componentes durante navegación SPA; recargar na
 - `shared/components/UiHeader.vue`: header independiente.
 - `shared/components/UiSidebar.vue`: sidebar independiente.
 - `shared/components/UiNavigation.vue`: enlaces y grupos compartidos.
-- `app/router/index.ts`: ruta padre pública. Agregar rutas de módulos a `children`.
+- `app/router/index.ts`: ruta padre `/panel`. Agregar rutas de módulos a `children`. La ruta `/` es el sitio público y no usa este layout.
 
 ## Header, sidebar o ambos
 
@@ -38,8 +38,8 @@ Cada configuración `header` y `sidebar` acepta:
 
 ```ts
 header: {
-  title: 'TecNM',
-  subtitle: 'Campus Monclova',
+  title: 'San Carlos',
+  subtitle: 'Ganadería y quesería',
   showTitle: true,
   showLogo: true,
 }
@@ -47,7 +47,7 @@ header: {
 
 - `showTitle`: muestra título y subtítulo.
 - `showLogo`: muestra logo. Ambos flags independientes; pueden estar apagados.
-- `logo`: URL opcional para otra aplicación. Por defecto usa `shared/assets/tecnm-isologo.svg`.
+- `logo`: URL opcional para otra aplicación. Por defecto usa `shared/assets/rancho-san-carlos-mark.svg`.
 - Mantener `title` aunque se oculte: da nombre accesible al enlace del logo.
 
 ## Enlaces y grupos
@@ -71,7 +71,7 @@ Registrar rutas de ejemplo antes de usarlas. `to` acepta destinos de Vue Router.
 Grupo tiene `children`, sin ruta propia. Un nivel de grupos; hijos son páginas.
 Header despliega panel; sidebar expande lista. Teclado usa Tab, Enter/Espacio y Escape para cerrar.
 En móvil navegación permanece disponible. No se oculta listado del header.
-El template incluye únicamente el enlace Inicio a la ruta pública `/`.
+El proyecto incluye los enlaces Panel (`/panel`) y Sitio público (`/`).
 Reemplazar destinos por páginas reales al agregar módulos; no crear vistas ficticias para template.
 
 ## Verificación

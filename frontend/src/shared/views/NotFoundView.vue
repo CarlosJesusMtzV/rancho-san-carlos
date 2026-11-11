@@ -15,7 +15,7 @@ function goHome() {
   <div class="not-found-page">
     <header class="not-found-header">
       <UiText as="div" class="not-found-brand">
-        TecNM<UiText as="small">Campus Monclova</UiText>
+        San Carlos<UiText as="small">Ganadería y quesería</UiText>
       </UiText>
       <UiToggle v-model="dark" type="switch" label="Modo oscuro" class="theme" />
     </header>
@@ -38,7 +38,7 @@ function goHome() {
       </UiCard>
     </main>
     <footer class="not-found-footer">
-      <UiText variant="body">Tecnológico Nacional de México · Campus Monclova</UiText>
+      <UiText variant="body">Rancho San Carlos y La Cremería San Carlos · Castaños, Coahuila</UiText>
     </footer>
   </div>
 </template>

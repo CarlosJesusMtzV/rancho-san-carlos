@@ -19,8 +19,10 @@
 - [x] Backend: entidades, configuración EF Core, `ApiExceptionHandler`, `HerdService`, `HerdController`.
 - [x] Frontend: listado, alta y edición, ficha con pesajes y baja, catálogos, becerros para venta.
 - [x] Corregir el desbordamiento de tablas en móvil (`.grid > *`, `.stack > *` con `min-width: 0` en `global.css`).
-- [ ] Compilar el backend: `dotnet build backend/TecNM.Api.csproj`.
-- [ ] Ejecutar los criterios de aceptación de la spec backend contra PostgreSQL real (Docker).
+- [x] Compilar el backend: `dotnet build backend/TecNM.Api.csproj` (0 errores, 0 advertencias).
+- [x] Ejecutar los criterios de aceptación de la spec backend contra PostgreSQL real.
+- [x] Quitar `[Produces]` del controller: forzaba `application/json` en los errores 400 de formato.
+- [ ] Repetir con Docker Compose y PostgreSQL 15 en la laptop.
 
 ## Decisiones
 
@@ -33,12 +35,19 @@
 
 ## Verificación y evidencia
 
-- Sintaxis C#: los 17 archivos `.cs` analizados con tree-sitter, sin errores.
-- Nombres: las 81 propiedades de las 6 entidades coinciden con columnas reales de PostgreSQL 16 creadas con `database.sql`, y los tipos son compatibles (`smallint`→`short`, `date`→`DateOnly`, `numeric`→`decimal`).
-- `npm --prefix frontend run build`: correcto. `node scripts/check-layout.mjs`: correcto.
-- Navegador sin interfaz contra una API simulada que sigue el contrato: 33 comprobaciones correctas (primer uso, catálogos, filtros por especie y sexo, 409 visibles sin perder datos, genealogía, pesajes, baja con confirmación, filtros en URL, becerros, API caída, sin desbordamiento a 375 px y en tema oscuro).
-- **No verificado:** compilación de C# y ejecución real de la API. El entorno de trabajo no tiene acceso a NuGet ni al SDK de .NET. Pendiente correr `dotnet build` y los criterios de aceptación de la spec backend.
+Ejecutado el 2026-11-11 con .NET SDK 10.0.404 y PostgreSQL 16 local, base creada con `database.sql`:
+
+- `dotnet build backend/TecNM.Api.csproj`: correcto, 0 errores y 0 advertencias.
+- API real: 40 comprobaciones correctas, que cubren los 10 criterios de aceptación de la spec backend y validaciones extra (genealogía, rangos de peso y fecha, paginación, búsqueda con comodines escapados, conteo por lote, 404 en español).
+- Errores de PostgreSQL forzados con restricciones temporales en la base de prueba: `CHECK` → 422 genérico, llave única → 409, trigger → 422 con su mensaje en español. Todos `application/problem+json`, sin excepción cruda y sin 500.
+- 12 peticiones simultáneas para crear la misma raza: 1 × 201 y 11 × 409, ningún 500.
+- Pantallas contra la API real (navegador sin interfaz): las 33 comprobaciones correctas, incluidos móvil 375 px y tema oscuro. La base quedó con los datos esperados (aretes en mayúsculas, `created_at` y `updated_at` llenos, baja con `exit_date`).
+- Pantallas contra API simulada: mismas 33 comprobaciones correctas.
+- `npm --prefix frontend run build` y `node scripts/check-layout.mjs`: correctos.
+- Sintaxis C# (tree-sitter) y nombres de columnas contra PostgreSQL (81/81): correctos.
+- Un 500 observado durante las pruebas se debió a borrar y recrear la base con la API encendida (conexión del pool cerrada). Con API y base iniciadas juntas: 0 errores 500.
+- **No verificado:** Docker Compose con PostgreSQL 15 y HTTPS.
 
 ## Estado y siguientes pasos
 
-Listo para compilar en la laptop. Si `dotnet build` marca errores, se corrigen antes de empezar Sanidad.
+Terminado. Falta probarlo en la laptop con Docker y unir la rama a `main`.

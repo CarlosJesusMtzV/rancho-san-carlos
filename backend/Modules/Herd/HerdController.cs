@@ -4,7 +4,6 @@ namespace TecNM.Api.Modules.Herd;
 
 [ApiController]
 [Route("api/herd")]
-[Produces("application/json")]
 public sealed class HerdController(HerdService herd) : ControllerBase
 {
     [HttpGet("catalog")]

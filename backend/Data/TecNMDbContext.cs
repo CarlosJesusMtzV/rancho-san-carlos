@@ -12,6 +12,13 @@ public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> opti
     public DbSet<Animal> Animals => Set<Animal>();
     public DbSet<WeightRecord> WeightRecords => Set<WeightRecord>();
     public DbSet<CalfSaleCandidate> CalfSaleCandidates => Set<CalfSaleCandidate>();
+    public DbSet<SupplyType> SupplyTypes => Set<SupplyType>();
+    public DbSet<Supply> Supplies => Set<Supply>();
+    public DbSet<VetVisit> VetVisits => Set<VetVisit>();
+    public DbSet<HealthEvent> HealthEvents => Set<HealthEvent>();
+    public DbSet<Treatment> Treatments => Set<Treatment>();
+    public DbSet<LabTest> LabTests => Set<LabTest>();
+    public DbSet<ActiveWithdrawal> ActiveWithdrawals => Set<ActiveWithdrawal>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

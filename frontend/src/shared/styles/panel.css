@@ -1,57 +1,42 @@
-/* Estilos propios del módulo Hato. Prefijo herd- para no chocar con global.css. */
+/* Patrones de página del panel compartidos por los módulos: barras de acciones, filtros, formularios, datos y paginación. */
 
-.herd-species {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.herd-species::before {
-  content: '';
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--brand-terracota);
-  flex: none;
-}
-.herd-species--2::before { background: var(--brand-mezquite); }
-
-.herd-toolbar {
+.panel-toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
-.herd-toolbar .btn { text-decoration: none; }
+.panel-toolbar .btn { text-decoration: none; }
 
-.herd-metrics {
+.panel-metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 16px;
 }
 
-.herd-filters {
+.panel-filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: 16px;
   align-items: end;
 }
-.herd-filters .field { margin-bottom: 0; }
+.panel-filters .field { margin-bottom: 0; }
 
-.herd-chips {
+.panel-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.herd-form {
+.panel-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 16px 24px;
 }
-.herd-form .field { margin-bottom: 0; }
-.herd-form .herd-span { grid-column: 1 / -1; }
+.panel-form .field { margin-bottom: 0; }
+.panel-form .panel-span { grid-column: 1 / -1; }
 
-.herd-radios {
+.panel-radios {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -59,20 +44,20 @@
   margin: 0;
   padding: 0;
 }
-.herd-radios legend {
+.panel-radios legend {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
   padding: 0;
 }
 
-.herd-facts {
+.panel-facts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: 16px 24px;
   margin: 0;
 }
-.herd-facts dt {
+.panel-facts dt {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -80,16 +65,16 @@
   color: var(--color-text-secondary);
   margin-bottom: 4px;
 }
-.herd-facts dd { margin: 0; font-weight: 600; }
+.panel-facts dd { margin: 0; font-weight: 600; }
 
-.herd-link {
+.panel-link {
   color: inherit;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.herd-pager {
+.panel-pager {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -98,16 +83,16 @@
   margin-top: 16px;
 }
 
-.herd-muted { color: var(--color-text-secondary); }
+.panel-muted { color: var(--color-text-secondary); }
 
-.herd-actions {
+.panel-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 8px;
 }
 
-.herd-icon-button {
+.panel-icon-button {
   min-height: 44px;
   padding: 0 12px;
   border: 0;
@@ -116,3 +101,5 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.panel-icon-button--neutral { color: var(--color-text-primary); }

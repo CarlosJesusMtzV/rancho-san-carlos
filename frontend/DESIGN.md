@@ -158,7 +158,8 @@ Usar siempre los de `src/shared/components/` (índice en `components/specs/compo
 - **Tablas (`UiTable`).** Primera columna con el identificador como enlace (arete, código). Desplazamiento horizontal propio en pantallas angostas. Códigos internos se muestran con su etiqueta en español.
 - **Formularios (`UiField`, `UiRadio`).** Etiqueta visible siempre; obligatorios con «*»; error de la API en un `UiAlert` arriba del formulario sin borrar lo capturado.
 - **Estados (`UiBadge`, `UiAlert`, `UiToast`).** Badge para el estado de un registro, alerta para errores o avisos de la pantalla, toast para confirmar una acción terminada.
-- **Especie.** Punto de color de la división seguido del nombre (`SpeciesTag` en el módulo Hato).
+- **Especie.** Punto de color de la división seguido del nombre (`SpeciesTag`, exportado por el módulo Hato).
+- **Patrones de página** (`shared/styles/panel.css`): `panel-toolbar`, `panel-filters`, `panel-form`, `panel-facts`, `panel-metrics`, `panel-pager`, `panel-link`, `panel-muted`. Úsalos antes de escribir CSS propio en un módulo.
 
 ---
 

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { animalHealthRoutes } from '../../modules/animal-health'
 import { herdRoutes } from '../../modules/herd'
 import { homeRoutes } from '../../modules/home'
 import { landingRoutes } from '../../modules/landing'
@@ -13,7 +14,7 @@ const router = createRouter({
     {
       path: '/panel',
       component: () => import('../layouts/MainLayout.vue'),
-      children: [...homeRoutes, ...herdRoutes],
+      children: [...homeRoutes, ...herdRoutes, ...animalHealthRoutes],
     },
     {
       path: '/:pathMatch(.*)*',

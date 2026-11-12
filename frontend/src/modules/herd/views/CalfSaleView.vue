@@ -3,12 +3,10 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
-import { UiBadge, UiBasePage, UiCard, UiMetric, UiTable } from '../../../shared/components'
+import { UiBadge, UiBasePage, UiCard, UiLoadError, UiMetric, UiTable } from '../../../shared/components'
 import { getCalfSaleCandidates } from '../api/herdApi'
-import LoadError from '../components/LoadError.vue'
 import { formatAge, formatDate, formatKg, sexLabels } from '../data/labels'
 import type { CalfSaleCandidate } from '../types/herd'
-import '../styles.css'
 
 const calves = ref<CalfSaleCandidate[] | null>(null)
 const error = ref('')
@@ -46,25 +44,25 @@ onMounted(load)
     description="Bovinos activos menores de 18 meses sin vender. La meta es una edad promedio de 8 meses o un peso aproximado de 150 kg."
   >
     <template #actions>
-      <div class="herd-toolbar">
+      <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'herd' }">Volver al hato</RouterLink>
       </div>
     </template>
 
-    <LoadError v-if="error" :message="error" @retry="load" />
+    <UiLoadError v-if="error" :message="error" @retry="load" />
     <p v-else-if="!calves" aria-busy="true">Cargando…</p>
 
     <div v-else class="stack">
-      <div class="herd-metrics">
+      <div class="panel-metrics">
         <UiCard metric><UiMetric label="Becerros en crecimiento" :value="rows.length" /></UiCard>
         <UiCard metric><UiMetric label="Alcanzaron la meta" :value="ready" description="8 meses o 150 kg" /></UiCard>
       </div>
 
       <UiCard title="Becerros">
-        <p v-if="rows.length === 0" class="herd-muted">No hay becerros en crecimiento registrados.</p>
+        <p v-if="rows.length === 0" class="panel-muted">No hay becerros en crecimiento registrados.</p>
         <UiTable v-else label="Becerros rumbo a la venta" :columns="columns" :rows="rows">
           <template #cell-visualTag="{ row }">
-            <RouterLink class="herd-link" :to="{ name: 'herd-animal', params: { id: row.animalId } }">{{ row.visualTag }}</RouterLink>
+            <RouterLink class="panel-link" :to="{ name: 'herd-animal', params: { id: row.animalId } }">{{ row.visualTag }}</RouterLink>
           </template>
           <template #cell-reachedSaleTarget="{ row }">
             <UiBadge :tone="row.reachedSaleTarget ? 'success' : 'info'">{{ row.reachedSaleTarget ? 'Lista para venta' : 'En crecimiento' }}</UiBadge>
@@ -72,7 +70,7 @@ onMounted(load)
           <template #cell-sex="{ row }">{{ sexLabels[row.sex] }}</template>
           <template #cell-ageMonths="{ row }">{{ formatAge(row.ageMonths) }}</template>
           <template #cell-lastWeightKg="{ row }">
-            {{ formatKg(row.lastWeightKg) }}<span v-if="row.lastWeighedOn" class="herd-muted"> · {{ formatDate(row.lastWeighedOn) }}</span>
+            {{ formatKg(row.lastWeightKg) }}<span v-if="row.lastWeighedOn" class="panel-muted"> · {{ formatDate(row.lastWeighedOn) }}</span>
           </template>
           <template #cell-lotCode="{ row }">{{ row.lotCode ?? '—' }}</template>
           <template #cell-meatAllowedFrom="{ row }">

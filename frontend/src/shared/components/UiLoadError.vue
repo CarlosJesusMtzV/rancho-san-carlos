@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { UiAlert, UiButton } from '../../../shared/components'
+import UiAlert from './UiAlert.vue'
+import UiButton from './UiButton.vue'
 
 defineProps<{ message: string }>()
 const emit = defineEmits<{ retry: [] }>()

@@ -52,7 +52,7 @@ El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, s
 | Orden | Módulo | Tablas principales | Especie |
 | --- | --- | --- | --- |
 | 1 | Hato | `species`, `breeds`, `animal_lots`, `animals`, `weight_records` | Ambas |
-| 2 | Sanidad | `health_events`, `treatments`, `lab_tests` | Ambas |
+| 2 | Sanidad | `vet_visits`, `health_events`, `treatments`, `lab_tests`, medicamentos en `supplies` | Ambas |
 | 3 | Reproducción | `breeding_events`, `birth_events` | Ambas |
 | 4 | Ordeña | `milk_lots`, `milk_records` | Caprino |
 | 5 | Quesería | `products`, `cheese_batches` | Caprino |
@@ -73,6 +73,17 @@ Confirmadas con la familia el 2026-11-10:
 | Venta de becerros | Vivos, con edad promedio de 8 meses y peso aproximado de 150 kg. |
 | Sellos del sitio | No había certificaciones oficiales. Se retiraron SINIIGA, SENASICA, NOM-051 y «Hato libre» porque el público los leería como certificaciones; se sustituyeron por compromisos propios. Si alguno se obtiene, se agrega de nuevo. |
 | Número de tablas | La materia no fija mínimo ni máximo. Se conservan RH, compras, finanzas y equipo por ahora; pueden retirarse si no se usan. |
+
+Sanidad, confirmado el 2026-11-11:
+
+| Decisión | Resultado |
+| --- | --- |
+| Quién atiende | Un veterinario externo que surte y cobra los medicamentos; su nombre se escribe en cada visita (sin catálogo). |
+| Pago | Por visita: honorarios y costo de medicamentos por separado. |
+| Inventario de medicamentos | No se lleva. `supply_stock` queda para alimento, cuajo y empaque. |
+| Retiros | Cada medicamento guarda días sugeridos de retiro de leche y carne; se pueden cambiar al aplicarlo. |
+| Aplicación | Individual o a todo un lote en un solo registro. |
+| Sin veterinario | La familia puede registrar eventos sin visita (por ejemplo, desparasitar). |
 
 Pendientes:
 

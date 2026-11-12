@@ -50,14 +50,7 @@ export function stagesFor(speciesId: SpeciesId, sex: Sex | ''): StageOption[] {
   return stages.filter((stage) => stage.speciesId === speciesId && (sex === '' || stage.sexes.includes(sex)))
 }
 
-const dateFormat = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
-
-/** Fecha ISO (YYYY-MM-DD) a DD/MM/AAAA, sin desfase de zona horaria. */
-export function formatDate(value: string | null): string {
-  if (!value) return '—'
-  const [year, month, day] = value.split('-').map(Number)
-  return dateFormat.format(new Date(Date.UTC(year, month - 1, day)))
-}
+export { formatDate, todayIso } from '../../../shared/utils/format'
 
 export function formatKg(value: number | null): string {
   if (value === null) return '—'
@@ -71,9 +64,4 @@ export function formatAge(months: number | null): string {
   const rest = months % 12
   const yearsText = years === 1 ? '1 año' : `${years} años`
   return rest === 0 ? yearsText : `${yearsText} ${rest} m`
-}
-
-/** Fecha de hoy en la zona del rancho, formato YYYY-MM-DD. */
-export function todayIso(): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date())
 }

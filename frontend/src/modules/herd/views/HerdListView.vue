@@ -3,15 +3,13 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
-import { UiAlert, UiBasePage, UiButton, UiCard, UiChip, UiField, UiMetric, UiTable } from '../../../shared/components'
+import { UiAlert, UiBasePage, UiButton, UiCard, UiChip, UiField, UiLoadError, UiMetric, UiTable } from '../../../shared/components'
 import { listAnimals } from '../api/herdApi'
 import LifecycleBadge from '../components/LifecycleBadge.vue'
-import LoadError from '../components/LoadError.vue'
 import SpeciesTag from '../components/SpeciesTag.vue'
 import { useCatalog } from '../composables/useCatalog'
 import { formatAge, formatKg, sexLabels, stageLabel } from '../data/labels'
 import type { AnimalPage, AnimalQuery, Sex, SpeciesId, StatusFilter } from '../types/herd'
-import '../styles.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -130,7 +128,7 @@ onMounted(() => {
 <template>
   <UiBasePage fluid title="Hato" description="Bovinos para carne y caprinos para cabritos y leche.">
     <template #actions>
-      <div class="herd-toolbar">
+      <div class="panel-toolbar">
         <RouterLink class="btn" :to="{ name: 'herd-new' }">Registrar animal</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'herd-calves' }">Becerros para venta</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'herd-catalog' }">Razas y lotes</RouterLink>
@@ -140,17 +138,17 @@ onMounted(() => {
     <div class="stack">
       <UiAlert v-if="catalog && !hasBreeds" tone="warning" title="Primero registra las razas">
         Para dar de alta animales necesitas al menos una raza por especie.
-        <RouterLink class="herd-link" :to="{ name: 'herd-catalog' }">Ir a razas y lotes</RouterLink>
+        <RouterLink class="panel-link" :to="{ name: 'herd-catalog' }">Ir a razas y lotes</RouterLink>
       </UiAlert>
       <UiAlert v-if="catalogError" tone="warning" title="Catálogos no disponibles">{{ catalogError }}</UiAlert>
 
-      <div class="herd-metrics">
+      <div class="panel-metrics">
         <UiCard metric><UiMetric label="Bovinos activos" :value="totals[1] ?? '—'" description="Becerros, vacas y toros" /></UiCard>
         <UiCard metric><UiMetric label="Caprinos activos" :value="totals[2] ?? '—'" description="Cabritos, cabras y sementales" /></UiCard>
       </div>
 
       <UiCard title="Animales" :description="page ? `${page.total} resultado${page.total === 1 ? '' : 's'}` : undefined">
-        <div class="herd-chips" role="group" aria-label="Especie">
+        <div class="panel-chips" role="group" aria-label="Especie">
           <UiChip
             v-for="option in speciesOptions"
             :key="option.label"
@@ -161,7 +159,7 @@ onMounted(() => {
           </UiChip>
         </div>
 
-        <form class="herd-filters" role="search" @submit.prevent="submitSearch">
+        <form class="panel-filters" role="search" @submit.prevent="submitSearch">
           <UiField
             as="select"
             label="Estado"
@@ -187,16 +185,16 @@ onMounted(() => {
           <UiButton type="submit" variant="secondary">Buscar</UiButton>
         </form>
 
-        <LoadError v-if="error" :message="error" @retry="loadAnimals" />
+        <UiLoadError v-if="error" :message="error" @retry="loadAnimals" />
         <p v-else-if="loading && !page" aria-busy="true">Cargando…</p>
-        <p v-else-if="page && page.items.length === 0" class="herd-muted">
+        <p v-else-if="page && page.items.length === 0" class="panel-muted">
           No hay animales con estos filtros.
-          <RouterLink v-if="hasBreeds" class="herd-link" :to="{ name: 'herd-new' }">Registrar el primero</RouterLink>
+          <RouterLink v-if="hasBreeds" class="panel-link" :to="{ name: 'herd-new' }">Registrar el primero</RouterLink>
         </p>
         <template v-else-if="page">
           <UiTable label="Animales del hato" :columns="columns" :rows="page.items" :aria-busy="loading || undefined">
             <template #cell-visualTag="{ row }">
-              <RouterLink class="herd-link" :to="{ name: 'herd-animal', params: { id: row.id } }">{{ row.visualTag }}</RouterLink>
+              <RouterLink class="panel-link" :to="{ name: 'herd-animal', params: { id: row.id } }">{{ row.visualTag }}</RouterLink>
             </template>
             <template #cell-speciesName="{ row }"><SpeciesTag :species-id="row.speciesId" /></template>
             <template #cell-sex="{ row }">{{ sexLabels[row.sex] }}</template>
@@ -206,7 +204,7 @@ onMounted(() => {
             <template #cell-lastWeightKg="{ row }">{{ formatKg(row.lastWeightKg) }}</template>
             <template #cell-lifecycleStatus="{ row }"><LifecycleBadge :status="row.lifecycleStatus" /></template>
           </UiTable>
-          <nav v-if="totalPages > 1" class="herd-pager" aria-label="Páginas">
+          <nav v-if="totalPages > 1" class="panel-pager" aria-label="Páginas">
             <UiButton variant="secondary" :disabled="(filters.page ?? 1) <= 1" @click="setFilters({ pagina: String((filters.page ?? 1) - 1) })">
               Anterior
             </UiButton>

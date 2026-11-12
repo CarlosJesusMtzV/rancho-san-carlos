@@ -1,0 +1,51 @@
+/* Estilos propios del módulo Sanidad. Los patrones de página están en shared/styles/panel.css. */
+
+.hl-animal-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 4px 16px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 16px 0 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+}
+
+.hl-animal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.hl-animal input { width: 18px; height: 18px; accent-color: var(--color-primary); flex: none; }
+
+.hl-treatment {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.hl-treatment .field { margin-bottom: 0; }
+
+@media (max-width: 760px) {
+  .hl-treatment { grid-template-columns: 1fr 1fr; }
+  .hl-treatment .field:first-child { grid-column: 1 / -1; }
+}
+
+.hl-result { margin: 0; align-items: center; }
+.hl-result-select {
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 13px;
+}

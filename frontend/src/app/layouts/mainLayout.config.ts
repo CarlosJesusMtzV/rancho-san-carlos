@@ -12,6 +12,7 @@ export const mainLayoutConfig = {
 export const headerNavigation: NavigationItem[] = [
   { label: 'Panel', to: '/panel' },
   { label: 'Hato', to: '/panel/hato' },
+  { label: 'Sanidad', to: '/panel/sanidad' },
   { label: 'Sitio público', to: '/' },
 ]
 
@@ -23,6 +24,17 @@ export const sidebarNavigation: NavigationItem[] = [
       { label: 'Animales', to: '/panel/hato' },
       { label: 'Becerros para venta', to: '/panel/hato/becerros' },
       { label: 'Razas y lotes', to: '/panel/hato/catalogos' },
+    ],
+  },
+  {
+    label: 'Sanidad',
+    children: [
+      { label: 'Resumen y retiros', to: '/panel/sanidad' },
+      { label: 'Registrar evento', to: '/panel/sanidad/eventos/nuevo' },
+      { label: 'Visitas del veterinario', to: '/panel/sanidad/visitas' },
+      { label: 'Historial', to: '/panel/sanidad/historial' },
+      { label: 'Medicamentos', to: '/panel/sanidad/medicamentos' },
+      { label: 'Laboratorio', to: '/panel/sanidad/laboratorio' },
     ],
   },
   { label: 'Sitio público', to: '/' },

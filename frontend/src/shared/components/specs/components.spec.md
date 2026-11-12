@@ -59,6 +59,7 @@ Las vistas de página dentro del layout deben usar `UiBasePage` como contenedor 
 - `UiField.options`: arreglo `{ value, label }[]` para select. Slot `options` permite opciones personalizadas.
 - `UiField` reenvía atributos nativos al control y expone método `focus()`.
 - `UiAlert`: `tone="success|warning|danger|info"`, `title` y contenido mediante slot.
+- `UiLoadError`: error al cargar datos con `message` y botón «Reintentar» que emite `retry`.
 - `UiToast`: expone `show(texto)` mediante ref. Muestra aviso durante cuatro segundos en región accesible.
 - `UiDialog`: `v-model` boolean, `title`, slot principal y slot `actions`. Escape cierra y foco vuelve al elemento previo.
 

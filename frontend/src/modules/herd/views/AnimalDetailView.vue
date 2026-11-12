@@ -3,14 +3,12 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
-import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiTable, UiToast } from '../../../shared/components'
+import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { addWeight, deleteWeight, getAnimal, registerExit } from '../api/herdApi'
 import LifecycleBadge from '../components/LifecycleBadge.vue'
-import LoadError from '../components/LoadError.vue'
 import SpeciesTag from '../components/SpeciesTag.vue'
 import { exitOptions, formatAge, formatDate, formatKg, lifecycleLabels, originLabels, sexLabels, stageLabel, todayIso } from '../data/labels'
 import type { AnimalDetail, ManualExitStatus, WeightItem } from '../types/herd'
-import '../styles.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -131,14 +129,16 @@ onMounted(async () => {
 <template>
   <UiBasePage fluid :title="animal ? `Arete ${animal.visualTag}` : 'Ficha del animal'">
     <template #actions>
-      <div class="herd-toolbar">
+      <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'herd' }">Volver al hato</RouterLink>
         <RouterLink v-if="animal" class="btn secondary" :to="{ name: 'herd-edit', params: { id: animal.id } }">Editar</RouterLink>
+        <RouterLink v-if="animal" class="btn secondary" :to="{ path: '/panel/sanidad/historial', query: { animal: animal.id } }">Historial sanitario</RouterLink>
+        <RouterLink v-if="animal && isActive" class="btn secondary" :to="{ path: '/panel/sanidad/eventos/nuevo', query: { animal: animal.id } }">Evento sanitario</RouterLink>
         <UiButton v-if="animal && isActive" variant="danger" @click="exitOpen = true">Dar de baja</UiButton>
       </div>
     </template>
 
-    <LoadError v-if="loadError" :message="loadError" @retry="load" />
+    <UiLoadError v-if="loadError" :message="loadError" @retry="load" />
     <p v-else-if="!animal" aria-busy="true">Cargando…</p>
 
     <div v-else class="stack">
@@ -147,7 +147,7 @@ onMounted(async () => {
       </UiAlert>
 
       <UiCard title="Datos generales">
-        <dl class="herd-facts">
+        <dl class="panel-facts">
           <div><dt>Especie</dt><dd><SpeciesTag :species-id="animal.speciesId" /></dd></div>
           <div><dt>Raza</dt><dd>{{ animal.breedName }}</dd></div>
           <div><dt>Sexo</dt><dd>{{ sexLabels[animal.sex] }}</dd></div>
@@ -159,23 +159,23 @@ onMounted(async () => {
           <div><dt>Edad</dt><dd>{{ formatAge(animal.ageMonths) }}</dd></div>
           <div><dt>Origen</dt><dd>{{ originLabels[animal.origin] }}</dd></div>
           <div><dt>Peso al nacer</dt><dd>{{ formatKg(animal.birthWeightKg) }}</dd></div>
-          <div><dt>Último peso</dt><dd>{{ formatKg(animal.lastWeightKg) }}<span v-if="animal.lastWeighedOn" class="herd-muted"> · {{ formatDate(animal.lastWeighedOn) }}</span></dd></div>
+          <div><dt>Último peso</dt><dd>{{ formatKg(animal.lastWeightKg) }}<span v-if="animal.lastWeighedOn" class="panel-muted"> · {{ formatDate(animal.lastWeighedOn) }}</span></dd></div>
         </dl>
       </UiCard>
 
       <UiCard title="Genealogía">
-        <dl class="herd-facts">
+        <dl class="panel-facts">
           <div>
             <dt>Padre</dt>
             <dd>
-              <RouterLink v-if="animal.sire" class="herd-link" :to="{ name: 'herd-animal', params: { id: animal.sire.id } }">{{ animal.sire.visualTag }}</RouterLink>
+              <RouterLink v-if="animal.sire" class="panel-link" :to="{ name: 'herd-animal', params: { id: animal.sire.id } }">{{ animal.sire.visualTag }}</RouterLink>
               <template v-else>Sin registrar</template>
             </dd>
           </div>
           <div>
             <dt>Madre</dt>
             <dd>
-              <RouterLink v-if="animal.dam" class="herd-link" :to="{ name: 'herd-animal', params: { id: animal.dam.id } }">{{ animal.dam.visualTag }}</RouterLink>
+              <RouterLink v-if="animal.dam" class="panel-link" :to="{ name: 'herd-animal', params: { id: animal.dam.id } }">{{ animal.dam.visualTag }}</RouterLink>
               <template v-else>Sin registrar</template>
             </dd>
           </div>
@@ -184,14 +184,14 @@ onMounted(async () => {
       </UiCard>
 
       <UiCard title="Pesajes" :description="`${animal.weights.length} registro${animal.weights.length === 1 ? '' : 's'}`">
-        <form v-if="isActive" class="herd-filters" novalidate @submit.prevent="saveWeight">
+        <form v-if="isActive" class="panel-filters" novalidate @submit.prevent="saveWeight">
           <UiField v-model="weightForm.weighedOn" label="Fecha *" type="date" :max="today" :min="animal.birthDate ?? undefined" required />
           <UiField v-model="weightForm.weightKg" label="Peso (kg) *" type="number" min="0.1" max="1500" step="0.01" inputmode="decimal" required />
           <UiField v-model="weightForm.notes" label="Notas" maxlength="255" />
           <UiButton type="submit" :loading="savingWeight">Registrar pesaje</UiButton>
         </form>
         <UiAlert v-if="weightError" tone="danger" title="No se registró">{{ weightError }}</UiAlert>
-        <p v-if="animal.weights.length === 0" class="herd-muted">Aún no hay pesajes.</p>
+        <p v-if="animal.weights.length === 0" class="panel-muted">Aún no hay pesajes.</p>
         <UiTable v-else label="Historial de pesajes" :columns="weightColumns" :rows="animal.weights">
           <template #cell-weighedOn="{ row }">{{ formatDate(row.weighedOn) }}</template>
           <template #cell-weightKg="{ row }">{{ formatKg(row.weightKg) }}</template>
@@ -199,7 +199,7 @@ onMounted(async () => {
           <template #cell-id="{ row }">
             <button
               type="button"
-              class="herd-icon-button"
+              class="panel-icon-button"
               :disabled="deletingWeightId !== null"
               :aria-label="`Eliminar pesaje del ${formatDate(row.weighedOn)}`"
               @click="removeWeight(row)"

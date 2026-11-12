@@ -3,13 +3,11 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
-import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiTable, UiToast } from '../../../shared/components'
+import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { createBreed, createLot } from '../api/herdApi'
-import LoadError from '../components/LoadError.vue'
 import SpeciesTag from '../components/SpeciesTag.vue'
 import { useCatalog } from '../composables/useCatalog'
 import type { SpeciesId } from '../types/herd'
-import '../styles.css'
 
 const { catalog, loading, error, load } = useCatalog()
 const toast = ref<InstanceType<typeof UiToast> | null>(null)
@@ -98,24 +96,24 @@ onMounted(load)
 <template>
   <UiBasePage fluid title="Razas y lotes" description="Catálogos del hato. Cada raza y cada lote pertenecen a una sola especie.">
     <template #actions>
-      <div class="herd-toolbar">
+      <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'herd' }">Volver al hato</RouterLink>
       </div>
     </template>
 
-    <LoadError v-if="error" :message="error" @retry="load" />
+    <UiLoadError v-if="error" :message="error" @retry="load" />
     <p v-else-if="loading && !catalog" aria-busy="true">Cargando…</p>
 
     <div v-else class="grid">
       <UiCard title="Razas">
-        <form class="herd-form" novalidate @submit.prevent="saveBreed">
+        <form class="panel-form" novalidate @submit.prevent="saveBreed">
           <UiField v-model="breedForm.speciesId" as="select" label="Especie *" :options="speciesOptions" />
           <UiField v-model="breedForm.name" label="Nombre *" maxlength="80" placeholder="Ej. Charolais, Alpina" required />
           <UiField v-model="breedForm.purpose" label="Propósito" maxlength="120" placeholder="Ej. Carne, leche" />
-          <div class="herd-span"><UiButton type="submit" :loading="savingBreed">Agregar raza</UiButton></div>
+          <div class="panel-span"><UiButton type="submit" :loading="savingBreed">Agregar raza</UiButton></div>
         </form>
         <UiAlert v-if="breedError" tone="danger" title="No se registró">{{ breedError }}</UiAlert>
-        <p v-if="breeds.length === 0" class="herd-muted">Aún no hay razas.</p>
+        <p v-if="breeds.length === 0" class="panel-muted">Aún no hay razas.</p>
         <UiTable v-else label="Razas registradas" :columns="breedColumns" :rows="breeds">
           <template #cell-speciesId="{ row }"><SpeciesTag :species-id="row.speciesId" /></template>
           <template #cell-purpose="{ row }">{{ row.purpose ?? '—' }}</template>
@@ -123,14 +121,14 @@ onMounted(load)
       </UiCard>
 
       <UiCard title="Lotes">
-        <form class="herd-form" novalidate @submit.prevent="saveLot">
+        <form class="panel-form" novalidate @submit.prevent="saveLot">
           <UiField v-model="lotForm.speciesId" as="select" label="Especie *" :options="speciesOptions" />
           <UiField v-model="lotForm.code" label="Código *" maxlength="30" placeholder="Ej. BOV-DESTETE" hint="Se guarda en mayúsculas." required />
           <UiField v-model="lotForm.description" label="Descripción" maxlength="255" />
-          <div class="herd-span"><UiButton type="submit" :loading="savingLot">Agregar lote</UiButton></div>
+          <div class="panel-span"><UiButton type="submit" :loading="savingLot">Agregar lote</UiButton></div>
         </form>
         <UiAlert v-if="lotError" tone="danger" title="No se registró">{{ lotError }}</UiAlert>
-        <p v-if="lots.length === 0" class="herd-muted">Aún no hay lotes.</p>
+        <p v-if="lots.length === 0" class="panel-muted">Aún no hay lotes.</p>
         <UiTable v-else label="Lotes registrados" :columns="lotColumns" :rows="lots">
           <template #cell-speciesId="{ row }"><SpeciesTag :species-id="row.speciesId" /></template>
           <template #cell-description="{ row }">{{ row.description ?? '—' }}</template>

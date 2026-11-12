@@ -6,5 +6,23 @@ defineProps<{ speciesId: SpeciesId }>()
 </script>
 
 <template>
-  <span class="herd-species" :class="`herd-species--${speciesId}`">{{ speciesLabels[speciesId] }}</span>
+  <span class="species-tag" :class="`species-tag--${speciesId}`">{{ speciesLabels[speciesId] }}</span>
 </template>
+
+<style scoped>
+/* El estilo vive en el componente porque otros módulos (Sanidad) también lo usan. */
+.species-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.species-tag::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand-terracota);
+  flex: none;
+}
+.species-tag--2::before { background: var(--brand-mezquite); }
+</style>

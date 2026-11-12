@@ -7,7 +7,7 @@ import { UiBadge, UiBasePage, UiCallout, UiCard, UiLayout } from '../../../share
 const modules: { name: string; scope: string; species: string; to?: string }[] = [
   { name: 'Hato', scope: 'Especies, razas, lotes, animales, pesajes y becerros para venta.', species: 'Bovino y caprino', to: '/panel/hato' },
   { name: 'Reproducción', scope: 'Montas, inseminaciones, partos y crías.', species: 'Bovino y caprino' },
-  { name: 'Sanidad', scope: 'Eventos sanitarios, tratamientos, retiros y pruebas de laboratorio.', species: 'Bovino y caprino' },
+  { name: 'Sanidad', scope: 'Visitas del veterinario, eventos, tratamientos, retiros y pruebas de laboratorio.', species: 'Bovino y caprino', to: '/panel/sanidad' },
   { name: 'Ordeña', scope: 'Litros por cabra y lotes de leche.', species: 'Solo caprino' },
   { name: 'Quesería', scope: 'Lotes de queso canasta, panela y asadero con trazabilidad a la leche.', species: 'Solo caprino' },
   { name: 'Matanza de cabritos', scope: 'Sacrificio y pelado para venta en canal, solo tras el retiro sanitario.', species: 'Solo caprino' },

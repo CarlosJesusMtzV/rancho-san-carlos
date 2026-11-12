@@ -1,3 +1,4 @@
+using TecNM.Api.Core;
 using TecNM.Api.Core.Entities;
 
 namespace TecNM.Api.Modules.Herd;
@@ -50,9 +51,7 @@ public static class HerdRules
         return months;
     }
 
-    /// <summary>Texto opcional: recorta y convierte la cadena vacía en nulo.</summary>
-    public static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    public static string? Clean(string? value) => TextInput.Clean(value);
 
-    /// <summary>Aretes y códigos: sin espacios sobrantes y en mayúsculas.</summary>
-    public static string? CleanCode(string? value) => Clean(value)?.ToUpperInvariant();
+    public static string? CleanCode(string? value) => TextInput.CleanCode(value);
 }

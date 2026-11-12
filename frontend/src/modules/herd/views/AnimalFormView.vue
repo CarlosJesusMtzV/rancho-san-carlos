@@ -3,13 +3,11 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
-import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiRadio } from '../../../shared/components'
+import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiRadio } from '../../../shared/components'
 import { createAnimal, getAnimal, listAnimals, updateAnimal } from '../api/herdApi'
-import LoadError from '../components/LoadError.vue'
 import { useCatalog } from '../composables/useCatalog'
 import { originLabels, stagesFor, todayIso } from '../data/labels'
 import type { AnimalInput, AnimalSummary, Origin, Sex, SpeciesId } from '../types/herd'
-import '../styles.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,20 +174,20 @@ onMounted(load)
     :title="editingId ? 'Editar animal' : 'Registrar animal'"
     description="Los campos con * son obligatorios. Raza, lote, etapa y padres se limitan a la especie elegida."
   >
-    <LoadError v-if="loadError || catalogError" :message="loadError || catalogError" @retry="load" />
+    <UiLoadError v-if="loadError || catalogError" :message="loadError || catalogError" @retry="load" />
     <p v-else-if="!ready" aria-busy="true">Cargando…</p>
 
     <UiAlert v-else-if="catalog && !hasBreeds" tone="warning" title="Primero registra las razas">
       Necesitas al menos una raza de la especie para dar de alta animales.
-      <RouterLink class="herd-link" :to="{ name: 'herd-catalog' }">Ir a razas y lotes</RouterLink>
+      <RouterLink class="panel-link" :to="{ name: 'herd-catalog' }">Ir a razas y lotes</RouterLink>
     </UiAlert>
 
     <form v-else class="stack" novalidate @submit.prevent="save">
       <UiAlert v-if="saveError" tone="danger" title="No se guardó">{{ saveError }}</UiAlert>
 
       <UiCard title="Identificación">
-        <div class="herd-form">
-          <fieldset class="herd-radios herd-span" :disabled="!!editingId">
+        <div class="panel-form">
+          <fieldset class="panel-radios panel-span" :disabled="!!editingId">
             <legend>Especie *</legend>
             <UiRadio v-model="form.speciesId" name="species" value="1" label="Bovino (carne)" />
             <UiRadio v-model="form.speciesId" name="species" value="2" label="Caprino (cabritos y leche)" />
@@ -204,7 +202,7 @@ onMounted(load)
       </UiCard>
 
       <UiCard title="Nacimiento y origen">
-        <div class="herd-form">
+        <div class="panel-form">
           <UiField v-model="form.birthDate" label="Fecha de nacimiento" type="date" :max="today" />
           <UiField v-model="form.origin" as="select" label="Origen" :options="originOptions" />
           <UiField v-model="form.birthWeightKg" label="Peso al nacer (kg)" type="number" min="0.1" max="100" step="0.01" inputmode="decimal" />
@@ -212,16 +210,16 @@ onMounted(load)
       </UiCard>
 
       <UiCard title="Genealogía">
-        <div class="herd-form">
+        <div class="panel-form">
           <UiField v-model="form.sireId" as="select" label="Padre" :options="sireOptions" />
           <UiField v-model="form.damId" as="select" label="Madre" :options="damOptions" />
-          <div class="herd-span">
+          <div class="panel-span">
             <UiField v-model="form.geneticsNotes" as="textarea" label="Notas genéticas" rows="3" maxlength="2000" />
           </div>
         </div>
       </UiCard>
 
-      <div class="herd-actions">
+      <div class="panel-actions">
         <UiButton type="submit" :loading="saving">{{ editingId ? 'Guardar cambios' : 'Registrar animal' }}</UiButton>
         <RouterLink
           class="btn secondary"

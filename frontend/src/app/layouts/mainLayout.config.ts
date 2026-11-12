@@ -14,6 +14,7 @@ export const headerNavigation: NavigationItem[] = [
   { label: 'Hato', to: '/panel/hato' },
   { label: 'Sanidad', to: '/panel/sanidad' },
   { label: 'Reproducción', to: '/panel/reproduccion' },
+  { label: 'Ordeña', to: '/panel/ordena' },
   { label: 'Sitio público', to: '/' },
 ]
 
@@ -47,5 +48,6 @@ export const sidebarNavigation: NavigationItem[] = [
       { label: 'Historial', to: '/panel/reproduccion/historial' },
     ],
   },
+  { label: 'Ordeña', to: '/panel/ordena' },
   { label: 'Sitio público', to: '/' },
 ]

@@ -62,8 +62,8 @@ Se conservan en todas las tablas, renombradas:
 | `TipoProducto` | `product_types` | `kind`: queso o ganado. |
 | `ProductoTerminado` | `products` | Agrega `sale_unit`; precio vacío para ganado cotizado. |
 | `InventarioProducto` | `cheese_batches` | El inventario se lleva por lote de queso (`kg_available`). |
-| `ProduccionLeche` | `milk_records` | `id_lote_leche` texto pasa a llave foránea a `milk_lots`. |
-| — (nueva) | `milk_lots` | Lote de leche: eslabón que faltaba para la trazabilidad. |
+| `ProduccionLeche` | `milk_records` | Cabras ordeñadas en cada ordeña; sin litros por cabra (se mide el total del día). Una cabra por ordeña. |
+| — (nueva) | `milk_lots` | Ordeña del día: un lote por fecha con el total de litros; eslabón de la trazabilidad del queso. |
 | — (nueva) | `weight_records` | Historial de pesajes en lugar de un solo peso. |
 | `ProcesoSacrificio` | `kid_slaughters` | Solo cabritos; peso vivo y peso en canal. |
 | `Despiece` | — (eliminada) | La canal de cabrito se vende entera; los becerros, vivos. |
@@ -114,7 +114,7 @@ Reglas sanitarias que la base garantiza aunque el backend falle. Lanzan `check_v
 
 | Trigger | Tabla | Regla |
 | --- | --- | --- |
-| `tg_milk_records_check` | `milk_records` | Solo hembras; sin retiro de leche en la fecha de ordeña |
+| `tg_milk_records_check` | `milk_records` | Solo cabras hembra activas; sin retiro de leche en la fecha de la ordeña (la del lote) |
 | `tg_kid_slaughters_check` | `kid_slaughters` | Sin retiro de carne en la fecha de sacrificio |
 
 Ambos usan `fn_withdrawal_allowed_from(animal, 'milk' \| 'meat', fecha)`. Un tratamiento con retiro de N días aplicado el día D bloquea hasta D + N − 1; desde D + N está permitido.
@@ -131,6 +131,7 @@ Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasita
 | --- | --- | --- |
 | 1 | `2026-11-11-01-sanidad.sql` | `vet_visits`, `health_events.vet_visit_id`, retiros sugeridos en `supplies`, tipos de insumo de sanidad, zona horaria |
 | 2 | `2026-11-11-02-reproduccion.sql` | Monta natural en `breeding_events`, `pregnancy_checks`, `birth_events.stillborn_count`, un parto por monta |
+| 3 | `2026-11-11-03-ordena.sql` | Total de litros por día en `milk_lots`, una ordeña por día, `milk_records` sin litros ni hora, trigger y vista de trazabilidad ajustados |
 
 Comprobado para cada script: aplicarlo sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` correspondiente (comparación con `pg_dump -s`).
 

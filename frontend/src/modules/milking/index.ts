@@ -1,0 +1,1 @@
+export { milkingRoutes } from './routes'

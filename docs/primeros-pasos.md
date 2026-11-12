@@ -55,6 +55,7 @@ Dentro de `psql`: `\dt` lista las tablas, `\dv` las vistas, `SELECT * FROM produ
 ```bash
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-01-sanidad.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-02-reproduccion.sql
+docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-03-ordena.sql
 ```
 
 Para empezar de cero con otro volumen usa otro nombre de proyecto:
@@ -91,7 +92,8 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 2. El módulo **Hato** ya está hecho: con Docker abre https://localhost:5173/panel/hato, registra primero razas en «Razas y lotes» y después los animales. Sin Docker las pantallas cargan pero muestran que no hay conexión con la API.
 3. **Sanidad** también: en https://localhost:5173/panel/sanidad registra primero los medicamentos y después las visitas y los eventos.
 4. **Reproducción** también, en https://localhost:5173/panel/reproduccion. Para diagnosticar preñez hace falta una visita del veterinario registrada en Sanidad.
-5. Siguiente módulo: **Ordeña**. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
+5. **Ordeña** en https://localhost:5173/panel/ordena: una ordeña al día con el total de litros y las cabras ordeñadas; las que tienen retiro de leche no se pueden marcar.
+6. Siguiente módulo: **Quesería**. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
 6. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
 
 ## Problemas comunes

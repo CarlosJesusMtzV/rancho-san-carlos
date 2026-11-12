@@ -9,13 +9,14 @@ Sistema de gestión ganadera y quesera del negocio familiar en Castaños, Coahui
 | Ruta | Qué es |
 | --- | --- |
 | `/` | Sitio público: catálogo, pedido y trazabilidad de muestra |
-| `/panel` | Sistema de gestión; disponibles: Hato (`/panel/hato`), Sanidad (`/panel/sanidad`) y Reproducción (`/panel/reproduccion`) |
+| `/panel` | Sistema de gestión; disponibles: Hato (`/panel/hato`), Sanidad (`/panel/sanidad`) Reproducción (`/panel/reproduccion`) y Ordeña (`/panel/ordena`) |
 | `/api/health` | Health check del backend |
 | `/api/herd/...` | API del módulo Hato ([spec](backend/Modules/Herd/specs/herd.spec.md)) |
 | `/api/animal-health/...` | API del módulo Sanidad ([spec](backend/Modules/AnimalHealth/specs/animal-health.spec.md)) |
 | `/api/reproduction/...` | API del módulo Reproducción ([spec](backend/Modules/Reproduction/specs/reproduction.spec.md)) |
+| `/api/milking/...` | API del módulo Ordeña ([spec](backend/Modules/Milking/specs/milking.spec.md)) |
 
-Estado: esquema de base de datos, identidad visual, sitio público y módulos Hato (animales, razas, lotes, pesajes y becerros para venta) Sanidad (visitas del veterinario, eventos, retiros, medicamentos y laboratorio) y Reproducción (montas, diagnóstico de preñez, partos y crías). Siguiente módulo: Ordeña. Seguimiento en [odd/tasks/](odd/tasks/).
+Estado: esquema de base de datos, identidad visual, sitio público y módulos Hato (animales, razas, lotes, pesajes y becerros para venta) Sanidad (visitas del veterinario, eventos, retiros, medicamentos y laboratorio) Reproducción (montas, diagnóstico de preñez, partos y crías) y Ordeña (ordeña diaria, cabras ordeñadas y lote de leche del día). Siguiente módulo: Quesería. Seguimiento en [odd/tasks/](odd/tasks/).
 
 Documentos del proyecto: [dominio y reglas de negocio](specs/domain.spec.md), [base de datos](specs/database.spec.md), [sitio público](frontend/src/modules/landing/specs/landing.spec.md), [panel](frontend/src/modules/home/specs/home.spec.md) e [identidad visual](frontend/DESIGN.md).
 

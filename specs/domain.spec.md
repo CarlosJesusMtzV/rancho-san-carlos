@@ -22,7 +22,7 @@ Sistema de gestión del negocio familiar en Castaños, Coahuila. Sustituye por c
 | R7 | Un animal vivo o una canal se venden una sola vez. | `uq_order_items_animal_active`, `uq_order_items_kid_slaughter_active` |
 | R8 | Solo se sacrifican cabritos; nunca bovinos. Sin despiece: la canal se vende entera. | Llave compuesta y `ck_kid_slaughters_goats_only` |
 | R9 | Un animal inactivo lleva fecha de salida; un cabrito sacrificado queda `slaughtered`. | `ck_animals_exit`; el estado lo actualiza el servicio de matanza |
-| R10 | No se ordeña una cabra con retiro de leche vigente. | `tg_milk_records_check` |
+| R10 | No se ordeña una cabra con retiro de leche vigente ni una que ya salió del hato. Una ordeña por día. | `tg_milk_records_check`, `uq_milk_lots_collection_date_active` |
 | R11 | No se sacrifica un cabrito con retiro de carne vigente. | `tg_kid_slaughters_check` |
 | R12 | Un becerro con retiro de carne vigente no se vende. | Servicio de ventas + `v_calf_sale_candidates.meat_allowed_from` (pendiente) |
 | R13 | Un lote de queso solo es de un producto tipo queso. | Servicio de quesería (pendiente) |
@@ -92,6 +92,14 @@ Reproducción, confirmado el 2026-11-11:
 | Método | Solo monta natural; sin inseminación. |
 | Crías | Se aretean y se dan de alta en el hato al registrar el parto. |
 | Preñez | La diagnostica el veterinario en sus visitas. |
+
+Ordeña, confirmado el 2026-11-11:
+
+| Decisión | Resultado |
+| --- | --- |
+| Frecuencia | Una ordeña al día. |
+| Medición | Total de litros de la ordeña; aparte, qué cabras se ordeñaron. Sin litros por cabra. |
+| Lote de leche | Toda la leche del día es un lote para quesería. |
 
 Tomadas al diseñar (cambiables sin tocar la base):
 

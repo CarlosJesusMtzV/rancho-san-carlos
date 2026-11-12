@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { animalHealthRoutes } from '../../modules/animal-health'
 import { herdRoutes } from '../../modules/herd'
 import { homeRoutes } from '../../modules/home'
+import { milkingRoutes } from '../../modules/milking'
 import { reproductionRoutes } from '../../modules/reproduction'
 import { landingRoutes } from '../../modules/landing'
 
@@ -15,7 +16,7 @@ const router = createRouter({
     {
       path: '/panel',
       component: () => import('../layouts/MainLayout.vue'),
-      children: [...homeRoutes, ...herdRoutes, ...animalHealthRoutes, ...reproductionRoutes],
+      children: [...homeRoutes, ...herdRoutes, ...animalHealthRoutes, ...reproductionRoutes, ...milkingRoutes],
     },
     {
       path: '/:pathMatch(.*)*',

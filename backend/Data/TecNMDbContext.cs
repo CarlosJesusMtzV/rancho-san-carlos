@@ -22,6 +22,8 @@ public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> opti
     public DbSet<BreedingEvent> BreedingEvents => Set<BreedingEvent>();
     public DbSet<PregnancyCheck> PregnancyChecks => Set<PregnancyCheck>();
     public DbSet<BirthEvent> BirthEvents => Set<BirthEvent>();
+    public DbSet<MilkLot> MilkLots => Set<MilkLot>();
+    public DbSet<MilkRecord> MilkRecords => Set<MilkRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

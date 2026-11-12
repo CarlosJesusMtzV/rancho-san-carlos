@@ -4,6 +4,7 @@ using TecNM.Api.Core.Errors;
 using TecNM.Api.Data;
 using TecNM.Api.Modules.AnimalHealth;
 using TecNM.Api.Modules.Herd;
+using TecNM.Api.Modules.Milking;
 using TecNM.Api.Modules.Reproduction;
 
 const string FrontendCors = "Frontend";
@@ -67,6 +68,7 @@ builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddScoped<HerdService>();
 builder.Services.AddScoped<AnimalHealthService>();
 builder.Services.AddScoped<ReproductionService>();
+builder.Services.AddScoped<MilkingService>();
 builder.Services.AddDbContext<TecNMDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddCors(options => options.AddPolicy(FrontendCors, policy =>
     policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));

@@ -9,10 +9,11 @@ Sistema de gestión ganadera y quesera del negocio familiar en Castaños, Coahui
 | Ruta | Qué es |
 | --- | --- |
 | `/` | Sitio público: catálogo, pedido y trazabilidad de muestra |
-| `/panel` | Sistema de gestión (módulos por construir) |
+| `/panel` | Sistema de gestión; disponible: Hato (`/panel/hato`) |
 | `/api/health` | Health check del backend |
+| `/api/herd/...` | API del módulo Hato ([spec](backend/Modules/Herd/specs/herd.spec.md)) |
 
-Estado: esquema de base de datos, identidad visual, sitio público y panel inicial. Ningún módulo de backend está implementado. Seguimiento en [odd/tasks/rancho-san-carlos-migration.md](odd/tasks/rancho-san-carlos-migration.md).
+Estado: esquema de base de datos, identidad visual, sitio público y módulo Hato (animales, razas, lotes, pesajes y becerros para venta). Siguiente módulo: Sanidad. Seguimiento en [odd/tasks/](odd/tasks/).
 
 Documentos del proyecto: [dominio y reglas de negocio](specs/domain.spec.md), [base de datos](specs/database.spec.md), [sitio público](frontend/src/modules/landing/specs/landing.spec.md), [panel](frontend/src/modules/home/specs/home.spec.md) e [identidad visual](frontend/DESIGN.md).
 

@@ -27,8 +27,8 @@
 - [ ] Arrancar con Docker y verificar `database.sql` en la imagen PostgreSQL 15.
 - [ ] Compilar el backend (`dotnet build`).
 - [ ] Colocar las fotos reales en `frontend/public/img/`.
-- [ ] Reescribir las secciones 2 a 7 de `frontend/DESIGN.md` con la paleta nueva.
-- [ ] Primer módulo: Hato (spec, entidades EF Core, API y vistas).
+- [x] Reescribir `frontend/DESIGN.md` con la paleta y tokens reales de la marca (2026-11-11).
+- [x] Primer módulo: Hato. Seguimiento en `odd/tasks/herd-module.md`.
 
 ## Decisiones
 

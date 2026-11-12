@@ -517,6 +517,12 @@ summary {
   align-content:start;
 }
 
+/* Los hijos de una rejilla no crecen al ancho de su contenido (p. ej. tablas): así .table-wrap desplaza dentro de la tarjeta. */
+.grid>*,
+.stack>* {
+  min-width:0;
+}
+
 .row {
   display:flex;
   align-items:center;

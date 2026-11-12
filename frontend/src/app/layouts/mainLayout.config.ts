@@ -11,10 +11,19 @@ export const mainLayoutConfig = {
 // Agregar aquí cada módulo cuando su ruta exista; no enlazar vistas pendientes.
 export const headerNavigation: NavigationItem[] = [
   { label: 'Panel', to: '/panel' },
+  { label: 'Hato', to: '/panel/hato' },
   { label: 'Sitio público', to: '/' },
 ]
 
 export const sidebarNavigation: NavigationItem[] = [
   { label: 'Panel', to: '/panel' },
+  {
+    label: 'Hato',
+    children: [
+      { label: 'Animales', to: '/panel/hato' },
+      { label: 'Becerros para venta', to: '/panel/hato/becerros' },
+      { label: 'Razas y lotes', to: '/panel/hato/catalogos' },
+    ],
+  },
   { label: 'Sitio público', to: '/' },
 ]

@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecNM.Api.Core.Errors;
 using TecNM.Api.Data;
+using TecNM.Api.Modules.Herd;
 
 const string FrontendCors = "Frontend";
 
@@ -45,12 +48,28 @@ foreach (var origin in allowedOrigins)
     }
 }
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+    // Datos con formato inválido (JSON mal formado, fechas o números ilegibles): mensaje único en español.
+    options.InvalidModelStateResponseFactory = context => new BadRequestObjectResult(new ProblemDetails
+    {
+        Status = StatusCodes.Status400BadRequest,
+        Title = "Datos inválidos",
+        Detail = "Revisa los datos: hay campos vacíos o con formato inválido.",
+        Instance = context.HttpContext.Request.Path,
+    })
+    {
+        ContentTypes = { "application/problem+json" },
+    });
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddScoped<HerdService>();
 builder.Services.AddDbContext<TecNMDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddCors(options => options.AddPolicy(FrontendCors, policy =>
     policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 app.UseCors(FrontendCors);

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
+
 import { UiBadge, UiBasePage, UiCallout, UiCard, UiLayout } from '../../../shared/components'
 
-// Módulos planeados del sistema. Cada uno se construye como vertical slice con su spec.
-const modules = [
-  { name: 'Hato', scope: 'Especies, razas, lotes, animales y pesajes.', species: 'Bovino y caprino' },
+// Módulos del sistema. Cada uno se construye como vertical slice con su spec; `to` marca los disponibles.
+const modules: { name: string; scope: string; species: string; to?: string }[] = [
+  { name: 'Hato', scope: 'Especies, razas, lotes, animales, pesajes y becerros para venta.', species: 'Bovino y caprino', to: '/panel/hato' },
   { name: 'Reproducción', scope: 'Montas, inseminaciones, partos y crías.', species: 'Bovino y caprino' },
   { name: 'Sanidad', scope: 'Eventos sanitarios, tratamientos, retiros y pruebas de laboratorio.', species: 'Bovino y caprino' },
   { name: 'Ordeña', scope: 'Litros por cabra y lotes de leche.', species: 'Solo caprino' },
@@ -21,14 +23,18 @@ const modules = [
         dan cabritos, que se venden en pie o en canal, y la leche con la que se elaboran los tres quesos. Solo se ordeñan
         cabras.
       </UiCallout>
-      <UiCard title="Módulos planeados" description="Ninguno está implementado todavía; este panel no consulta la API.">
+      <UiCard title="Módulos" description="Se construyen en este orden. Los disponibles llevan enlace.">
         <ul class="module-list">
           <li v-for="module in modules" :key="module.name">
             <div>
-              <strong>{{ module.name }}</strong>
+              <RouterLink v-if="module.to" class="module-link" :to="module.to">{{ module.name }}</RouterLink>
+              <strong v-else>{{ module.name }}</strong>
               <p>{{ module.scope }}</p>
             </div>
-            <UiBadge :tone="module.species === 'Solo caprino' ? 'success' : 'info'">{{ module.species }}</UiBadge>
+            <div class="module-tags">
+              <UiBadge :tone="module.species === 'Solo caprino' ? 'success' : 'info'">{{ module.species }}</UiBadge>
+              <UiBadge :tone="module.to ? 'success' : 'warning'">{{ module.to ? 'Disponible' : 'Pendiente' }}</UiBadge>
+            </div>
           </li>
         </ul>
       </UiCard>
@@ -49,4 +55,6 @@ const modules = [
 }
 .module-list li:first-child { border-top: 0; }
 .module-list p { font-size: 14px; }
+.module-link { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.module-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 </style>

@@ -128,7 +128,7 @@ Solo catálogos: 2 especies, 3 tipos de producto y 6 productos. No se cargan usu
 - Llaves compuestas de especie: mapear `species_id` como propiedad normal y dejar que la base valide.
 - Filtro global `deleted_at == null` para el borrado lógico.
 
-Ninguna entidad está mapeada todavía.
+Mapeadas: `species`, `breeds`, `animal_lots`, `animals`, `weight_records` y la vista `v_calf_sale_candidates` (módulo Hato). El `DbContext` convierte cada propiedad a su columna `snake_case` automáticamente, así que basta con que el nombre de la propiedad coincida con la columna en PascalCase.
 
 ## Aceptación
 

@@ -1,0 +1,118 @@
+/* Estilos propios del módulo Hato. Prefijo herd- para no chocar con global.css. */
+
+.herd-species {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.herd-species::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand-terracota);
+  flex: none;
+}
+.herd-species--2::before { background: var(--brand-mezquite); }
+
+.herd-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.herd-toolbar .btn { text-decoration: none; }
+
+.herd-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 16px;
+}
+
+.herd-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 16px;
+  align-items: end;
+}
+.herd-filters .field { margin-bottom: 0; }
+
+.herd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.herd-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px 24px;
+}
+.herd-form .field { margin-bottom: 0; }
+.herd-form .herd-span { grid-column: 1 / -1; }
+
+.herd-radios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.herd-radios legend {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.herd-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 16px 24px;
+  margin: 0;
+}
+.herd-facts dt {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+.herd-facts dd { margin: 0; font-weight: 600; }
+
+.herd-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.herd-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.herd-muted { color: var(--color-text-secondary); }
+
+.herd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.herd-icon-button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--destructive-text);
+  font-weight: 600;
+  cursor: pointer;
+}

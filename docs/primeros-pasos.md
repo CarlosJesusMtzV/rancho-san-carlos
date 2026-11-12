@@ -81,8 +81,9 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 ## Cómo seguir
 
 1. Lee `specs/domain.spec.md`: reglas del negocio y orden de módulos.
-2. Primer módulo: **Hato**. Escribe su spec en `backend/Modules/Herd/specs/herd.spec.md` antes del código (flujo en `CONTRIBUTING.md`).
-3. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
+2. El módulo **Hato** ya está hecho: con Docker abre https://localhost:5173/panel/hato, registra primero razas en «Razas y lotes» y después los animales. Sin Docker las pantallas cargan pero muestran que no hay conexión con la API.
+3. Siguiente módulo: **Sanidad**. Su spec va en `backend/Modules/Health/specs/` antes del código (flujo en `CONTRIBUTING.md`).
+4. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
 
 ## Problemas comunes
 

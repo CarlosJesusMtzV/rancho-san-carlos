@@ -5,9 +5,9 @@
 Página de entrada del sistema de gestión en `/panel`, dentro de `MainLayout`. Sin datos ni operaciones de negocio todavía.
 
 - Usa `UiBasePage` con `fluid=true` y componentes compartidos.
-- Muestra las reglas del negocio y la lista de módulos planeados con la especie a la que aplican.
+- Muestra las reglas del negocio y la lista de módulos con la especie a la que aplican; los disponibles enlazan a su ruta y se marcan «Disponible», el resto «Pendiente».
 - No realiza peticiones a la API.
-- La navegación lateral solo enlaza rutas existentes: Panel y Sitio público.
+- La navegación lateral solo enlaza rutas existentes: Panel, el grupo Hato y Sitio público.
 - Cada módulo nuevo exporta sus rutas por `index.ts` y se agrega como hija de `/panel`.
 - Textos en español de México; identidad Rancho San Carlos.
 

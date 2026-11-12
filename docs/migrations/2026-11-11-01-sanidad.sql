@@ -5,7 +5,7 @@
 -- Una base nueva ya trae estos cambios: no ejecutar ahí.
 --
 -- Uso (desde la raíz del proyecto, con Docker en marcha):
---   docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-sanidad.sql
+--   docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-01-sanidad.sql
 -- =============================================================================
 
 BEGIN;

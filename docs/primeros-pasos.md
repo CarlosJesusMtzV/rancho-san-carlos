@@ -50,10 +50,11 @@ docker compose exec db psql -U tecnm_app -d tecnm_template
 
 Dentro de `psql`: `\dt` lista las tablas, `\dv` las vistas, `SELECT * FROM products;` muestra el catálogo y `\q` sale.
 
-`database.sql` solo se ejecuta la primera vez. Si ya habías creado la base antes del módulo Sanidad, aplica una vez su migración:
+`database.sql` solo se ejecuta la primera vez. Si ya habías creado la base antes, aplica una vez, en orden, las migraciones que te falten (`docs/migrations/`, lista en `specs/database.spec.md`):
 
 ```bash
-docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-sanidad.sql
+docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-01-sanidad.sql
+docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-02-reproduccion.sql
 ```
 
 Para empezar de cero con otro volumen usa otro nombre de proyecto:
@@ -89,8 +90,9 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 1. Lee `specs/domain.spec.md`: reglas del negocio y orden de módulos.
 2. El módulo **Hato** ya está hecho: con Docker abre https://localhost:5173/panel/hato, registra primero razas en «Razas y lotes» y después los animales. Sin Docker las pantallas cargan pero muestran que no hay conexión con la API.
 3. **Sanidad** también: en https://localhost:5173/panel/sanidad registra primero los medicamentos y después las visitas y los eventos.
-4. Siguiente módulo: **Reproducción**. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
-5. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
+4. **Reproducción** también, en https://localhost:5173/panel/reproduccion. Para diagnosticar preñez hace falta una visita del veterinario registrada en Sanidad.
+5. Siguiente módulo: **Ordeña**. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
+6. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
 
 ## Problemas comunes
 

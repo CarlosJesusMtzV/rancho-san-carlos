@@ -19,6 +19,9 @@ public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> opti
     public DbSet<Treatment> Treatments => Set<Treatment>();
     public DbSet<LabTest> LabTests => Set<LabTest>();
     public DbSet<ActiveWithdrawal> ActiveWithdrawals => Set<ActiveWithdrawal>();
+    public DbSet<BreedingEvent> BreedingEvents => Set<BreedingEvent>();
+    public DbSet<PregnancyCheck> PregnancyChecks => Set<PregnancyCheck>();
+    public DbSet<BirthEvent> BirthEvents => Set<BirthEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

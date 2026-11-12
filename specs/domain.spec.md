@@ -53,7 +53,7 @@ El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, s
 | --- | --- | --- | --- |
 | 1 | Hato | `species`, `breeds`, `animal_lots`, `animals`, `weight_records` | Ambas |
 | 2 | Sanidad | `vet_visits`, `health_events`, `treatments`, `lab_tests`, medicamentos en `supplies` | Ambas |
-| 3 | Reproducción | `breeding_events`, `birth_events` | Ambas |
+| 3 | Reproducción | `breeding_events`, `pregnancy_checks`, `birth_events`, crías en `animals` | Ambas |
 | 4 | Ordeña | `milk_lots`, `milk_records` | Caprino |
 | 5 | Quesería | `products`, `cheese_batches` | Caprino |
 | 6 | Matanza de cabritos | `kid_slaughters` | Caprino |
@@ -84,6 +84,22 @@ Sanidad, confirmado el 2026-11-11:
 | Retiros | Cada medicamento guarda días sugeridos de retiro de leche y carne; se pueden cambiar al aplicarlo. |
 | Aplicación | Individual o a todo un lote en un solo registro. |
 | Sin veterinario | La familia puede registrar eventos sin visita (por ejemplo, desparasitar). |
+
+Reproducción, confirmado el 2026-11-11:
+
+| Decisión | Resultado |
+| --- | --- |
+| Método | Solo monta natural; sin inseminación. |
+| Crías | Se aretean y se dan de alta en el hato al registrar el parto. |
+| Preñez | La diagnostica el veterinario en sus visitas. |
+
+Tomadas al diseñar (cambiables sin tocar la base):
+
+| Decisión | Valor |
+| --- | --- |
+| Gestación para la fecha probable de parto | Bovino 283 días; caprino 150 días |
+| Crías muertas al nacer | Solo se cuentan en el parto; no se dan de alta |
+| Raza y lote de la cría | Por omisión los de la madre; se pueden cambiar en el parto |
 
 Pendientes:
 

@@ -6,7 +6,7 @@ import { UiBadge, UiBasePage, UiCallout, UiCard, UiLayout } from '../../../share
 // Módulos del sistema. Cada uno se construye como vertical slice con su spec; `to` marca los disponibles.
 const modules: { name: string; scope: string; species: string; to?: string }[] = [
   { name: 'Hato', scope: 'Especies, razas, lotes, animales, pesajes y becerros para venta.', species: 'Bovino y caprino', to: '/panel/hato' },
-  { name: 'Reproducción', scope: 'Montas, inseminaciones, partos y crías.', species: 'Bovino y caprino' },
+  { name: 'Reproducción', scope: 'Montas naturales, diagnóstico de preñez del veterinario, partos y alta de crías.', species: 'Bovino y caprino', to: '/panel/reproduccion' },
   { name: 'Sanidad', scope: 'Visitas del veterinario, eventos, tratamientos, retiros y pruebas de laboratorio.', species: 'Bovino y caprino', to: '/panel/sanidad' },
   { name: 'Ordeña', scope: 'Litros por cabra y lotes de leche.', species: 'Solo caprino' },
   { name: 'Quesería', scope: 'Lotes de queso canasta, panela y asadero con trazabilidad a la leche.', species: 'Solo caprino' },

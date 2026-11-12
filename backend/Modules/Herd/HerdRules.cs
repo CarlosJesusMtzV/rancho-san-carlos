@@ -34,22 +34,7 @@ public static class HerdRules
     public static bool StageExists(short speciesId, string stage) =>
         Stages.Any(item => item.SpeciesId == speciesId && item.Code == stage);
 
-    /// <summary>Meses cumplidos entre el nacimiento y la fecha indicada.</summary>
-    public static int? AgeInMonths(DateOnly? birthDate, DateOnly today)
-    {
-        if (birthDate is not { } birth || birth > today)
-        {
-            return null;
-        }
-
-        var months = (today.Year - birth.Year) * 12 + today.Month - birth.Month;
-        if (today.Day < birth.Day)
-        {
-            months--;
-        }
-
-        return months;
-    }
+    public static int? AgeInMonths(DateOnly? birthDate, DateOnly today) => AnimalAge.InMonths(birthDate, today);
 
     public static string? Clean(string? value) => TextInput.Clean(value);
 

@@ -15,7 +15,7 @@
 ## Tareas
 
 - [x] Esquema: `vet_visits`, `health_events.vet_visit_id`, retiros sugeridos en `supplies`, tipos de insumo iniciales, zona horaria de la base.
-- [x] Migración `docs/migrations/2026-11-11-sanidad.sql` para bases existentes.
+- [x] Migración `docs/migrations/2026-11-11-01-sanidad.sql` para bases existentes.
 - [x] Backend `/api/animal-health`.
 - [x] Pantallas `/panel/sanidad` y enlaces desde la ficha de Hato.
 - [x] Patrones de página compartidos en `shared/styles/panel.css`; `UiLoadError` y `shared/utils/format.ts` compartidos.

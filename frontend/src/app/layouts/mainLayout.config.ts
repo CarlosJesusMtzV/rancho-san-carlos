@@ -13,6 +13,7 @@ export const headerNavigation: NavigationItem[] = [
   { label: 'Panel', to: '/panel' },
   { label: 'Hato', to: '/panel/hato' },
   { label: 'Sanidad', to: '/panel/sanidad' },
+  { label: 'Reproducción', to: '/panel/reproduccion' },
   { label: 'Sitio público', to: '/' },
 ]
 
@@ -35,6 +36,15 @@ export const sidebarNavigation: NavigationItem[] = [
       { label: 'Historial', to: '/panel/sanidad/historial' },
       { label: 'Medicamentos', to: '/panel/sanidad/medicamentos' },
       { label: 'Laboratorio', to: '/panel/sanidad/laboratorio' },
+    ],
+  },
+  {
+    label: 'Reproducción',
+    children: [
+      { label: 'Hembras', to: '/panel/reproduccion' },
+      { label: 'Registrar monta', to: '/panel/reproduccion/montas/nueva' },
+      { label: 'Registrar parto', to: '/panel/reproduccion/partos/nuevo' },
+      { label: 'Historial', to: '/panel/reproduccion/historial' },
     ],
   },
   { label: 'Sitio público', to: '/' },

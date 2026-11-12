@@ -134,6 +134,7 @@ onMounted(async () => {
         <RouterLink v-if="animal" class="btn secondary" :to="{ name: 'herd-edit', params: { id: animal.id } }">Editar</RouterLink>
         <RouterLink v-if="animal" class="btn secondary" :to="{ path: '/panel/sanidad/historial', query: { animal: animal.id } }">Historial sanitario</RouterLink>
         <RouterLink v-if="animal && isActive" class="btn secondary" :to="{ path: '/panel/sanidad/eventos/nuevo', query: { animal: animal.id } }">Evento sanitario</RouterLink>
+        <RouterLink v-if="animal?.sex === 'F'" class="btn secondary" :to="{ path: '/panel/reproduccion/historial', query: { hembra: animal.id } }">Reproducción</RouterLink>
         <UiButton v-if="animal && isActive" variant="danger" @click="exitOpen = true">Dar de baja</UiButton>
       </div>
     </template>

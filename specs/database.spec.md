@@ -4,7 +4,7 @@
 
 Contrato del esquema PostgreSQL definido en [`database.sql`](../database.sql). Parte del diseño original `BDPRY.sql` (50 tablas, sintaxis de SQL Server exportada de un diagrama) y lo corrige para PostgreSQL 15 y las convenciones del template.
 
-- 49 tablas, 6 vistas y 2 triggers de reglas sanitarias, todo en `snake_case` e inglés.
+- 50 tablas, 6 vistas y 2 triggers de reglas sanitarias, todo en `snake_case` e inglés.
 - Solo ganado bovino y caprino; reglas de dominio en [`domain.spec.md`](domain.spec.md).
 - Se ejecuta al inicializar un volumen nuevo. No migra bases existentes.
 
@@ -46,8 +46,9 @@ Se conservan en todas las tablas, renombradas:
 | `Animal` | `animals` | Agrega `species_id`, `origin`, `lifecycle_status`, `exit_date`; quita `peso_actual`. |
 | `LoteAnimal` | `animal_lots` |  |
 | `RegistroGenetico` | `animals` (`sire_id`, `dam_id`, `genetics_notes`) | Fusionada: era 1 a 1 con Animal. |
-| `Reproduccion` | `breeding_events` | `id_insumo_semen` ahora apunta a `supplies`, no a existencias. |
-| `Parto` | `birth_events` | Enlace opcional al evento reproductivo. |
+| `Reproduccion` | `breeding_events` | Solo monta natural: sin método ni semen; semental obligatorio; `species_id` con llaves compuestas para que hembra y semental sean de la misma especie; fecha probable de parto obligatoria. |
+| — (nueva) | `pregnancy_checks` | Diagnóstico de preñez del veterinario, ligado a una visita. |
+| `Parto` | `birth_events` | Enlace opcional a la monta (un parto por monta); cuenta crías vivas y muertas al nacer. |
 | `Cria` | `animals` (`birth_event_id`, `birth_weight_kg`) | Fusionada: era 1 a 1 con Animal. |
 | `TipoInsumo` | `supply_types` | `category` con valores controlados. Catálogo inicial: Medicamento, Vacuna, Desparasitante. |
 | `Insumo` | `supplies` | Agrega días de retiro sugeridos para leche y carne. Los medicamentos no llevan existencias. |
@@ -124,13 +125,14 @@ Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasita
 
 ## Cambios a bases existentes
 
-`database.sql` solo se ejecuta al crear el volumen. Cada cambio posterior trae un script en `docs/migrations/` que se aplica una vez, en orden de fecha:
+`database.sql` solo se ejecuta al crear el volumen. Cada cambio posterior trae un script en `docs/migrations/` que se aplica una vez, en orden de nombre:
 
-| Fecha | Script | Cambio |
+| Orden | Script | Cambio |
 | --- | --- | --- |
-| 2026-11-11 | `2026-11-11-sanidad.sql` | `vet_visits`, `health_events.vet_visit_id`, retiros sugeridos en `supplies`, tipos de insumo de sanidad |
+| 1 | `2026-11-11-01-sanidad.sql` | `vet_visits`, `health_events.vet_visit_id`, retiros sugeridos en `supplies`, tipos de insumo de sanidad, zona horaria |
+| 2 | `2026-11-11-02-reproduccion.sql` | Monta natural en `breeding_events`, `pregnancy_checks`, `birth_events.stillborn_count`, un parto por monta |
 
-Comprobado: aplicar el script sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` actual (comparación con `pg_dump -s`).
+Comprobado para cada script: aplicarlo sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` correspondiente (comparación con `pg_dump -s`).
 
 ## Mapeo EF Core
 
@@ -146,7 +148,7 @@ Mapeadas: `species`, `breeds`, `animal_lots`, `animals`, `weight_records` y la v
 Verificado en PostgreSQL 16 local el 2026-11-10 (la imagen del proyecto usa PostgreSQL 15; falta repetirlo con Docker):
 
 1. El script completo corre en una transacción sin errores.
-2. 49 tablas, 6 vistas, 2 triggers, 0 identificadores con mayúsculas.
+2. 50 tablas, 6 vistas, 2 triggers, 0 identificadores con mayúsculas.
 3. Ordeña de cabra aceptada; ordeña de bovino, de macho o de cabra con retiro rechazada; aceptada al terminar el retiro.
 4. Matanza de bovino, de cabrito con retiro o con canal mayor que el peso vivo rechazada; aceptada tras el retiro.
 5. Raza o lote de otra especie y tercera especie rechazados.

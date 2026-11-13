@@ -13,7 +13,7 @@ export const pillars = [
   },
   {
     title: 'Doble vocación productiva',
-    text: 'Vacas para carne y chivas para cabritos y leche. De esa leche salen el queso canasta, el panela y el asadero.',
+    text: 'Vacas para carne y chivas para cabritos y leche. De esa leche salen el queso canasta y el panela.',
   },
   {
     title: 'Trazabilidad y control',
@@ -26,7 +26,7 @@ export const pillars = [
 ]
 
 export const craftFeatures = [
-  { title: 'Leche de cabra propia', text: 'Tres quesos elaborados con la ordeña diaria de nuestro hato caprino.' },
+  { title: 'Leche de cabra propia', text: 'Canasta y panela elaborados con la ordeña diaria de nuestro hato caprino.' },
   { title: 'Cadena de frío', text: 'Conservación de 2 °C a 6 °C desde la cremería hasta la entrega.' },
   { title: 'Corteza a la vista', text: 'La etiqueta deja ver el relieve auténtico del tejido de la canasta.' },
   { title: 'Lote identificado', text: 'Cada rueda lleva su lote, fecha de elaboración y caducidad.' },

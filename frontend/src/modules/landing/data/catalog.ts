@@ -34,7 +34,7 @@ export const products: Product[] = [
     subtitle: 'Frescura suave de ordeña diaria',
     name: 'Queso Panela Artesanal',
     description:
-      'Queso blanco y fresco de leche de cabra, de pasta firme pero suave al corte, sin conservadores ni sustitutos. Ideal para rebanar o asar ligeramente.',
+      'Queso blanco y fresco de leche de cabra, de pasta firme pero suave al corte, sin conservadores ni sustitutos. Es el mismo queso del canasta, en molde de panela. Ideal para rebanar o asar ligeramente.',
     specLabel: 'Presentaciones',
     spec: 'Pieza de 1 kg · Conservar de 2 °C a 6 °C',
     priceLabel: '$120 MXN por pieza',
@@ -45,16 +45,16 @@ export const products: Product[] = [
   {
     id: 'queso-asadero',
     division: 'cheese',
-    badge: 'La Cremería San Carlos',
+    badge: 'De proveedor',
     subtitle: 'Hebra suave y fundido parejo',
-    name: 'Queso Asadero Artesanal',
+    name: 'Queso Asadero',
     description:
-      'Elaborado en paila con leche de cabra del rancho. Su pasta elástica y brillante funde de manera uniforme en comal, parrilla o cazuela norteña.',
+      'Queso asadero de leche de vaca que compramos a un proveedor para completar nuestra oferta; no lo elaboramos en la cremería. Funde de manera uniforme en comal, parrilla o cazuela norteña.',
     specLabel: 'Presentaciones',
-    spec: 'Pieza de 500 g · Empaque al vacío',
+    spec: 'Pieza de 500 g · Leche de vaca · Conservar de 2 °C a 6 °C',
     priceLabel: '$80 MXN por pieza',
     image: '/img/queso-asadero.jpg',
-    imageAlt: 'Queso asadero artesanal en pieza de 500 gramos',
+    imageAlt: 'Queso asadero en pieza de 500 gramos',
     presentations: [{ id: 'pieza-500g', sku: 'QSO-ASA', label: 'Pieza de 500 g', price: 80 }],
   },
   {

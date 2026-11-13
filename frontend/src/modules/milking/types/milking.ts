@@ -19,6 +19,7 @@ export interface MilkDaySummary {
 
 export interface MilkDayDetail extends MilkDaySummary {
   goats: { animalId: number; visualTag: string }[]
+  cheeseBatch: { id: number; code: string; litersUsed: number } | null
 }
 
 export interface MilkPeriod {

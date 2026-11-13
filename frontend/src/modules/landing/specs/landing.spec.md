@@ -16,7 +16,7 @@ Página pública en `/`, fuera de `MainLayout`: tiene encabezado y pie propios. 
 - Precios y SKU de `data/catalog.ts` coinciden con `products` en `database.sql` y con `specs/domain.spec.md`.
 - El queso canasta se agrega por rueda (4.5 kg o 5 kg) a $120 MXN/kg. El ganado se agrega como cotización, sin precio y una sola vez por presentación.
 - Cabritos: dos presentaciones, en pie (`GAN-CAB`) y en canal (`CAB-CAN`). Becerros: solo en pie (`GAN-BEC`), con edad promedio de 8 meses y peso aproximado de 150 kg.
-- Los tres quesos se describen como exclusivamente de leche de cabra. Los becerros, como ganado para carne vendido vivo.
+- Canasta y panela se describen como de leche de cabra propia; el asadero, como queso de leche de vaca comprado a un proveedor, nunca como propio ni de cabra. Los becerros, como ganado para carne vendido vivo.
 - Sin sellos ni nombres de autoridades o normas (SINIIGA, SENASICA, NOM) mientras el rancho no tenga la certificación correspondiente; el pie muestra compromisos propios.
 - El pedido no se envía: «Copiar resumen» deja el texto en el portapapeles. La pantalla lo dice explícitamente.
 - La trazabilidad se anuncia como demostración mientras no exista la API.

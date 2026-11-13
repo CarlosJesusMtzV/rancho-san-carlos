@@ -6,6 +6,9 @@ public sealed record MilkDaySummary(int Id, string Code, DateOnly CollectionDate
 
 public sealed record MilkedGoat(int AnimalId, string VisualTag);
 
+/// <summary>Tanda de queso que usó la leche de la ordeña.</summary>
+public sealed record MilkDayCheeseBatch(int Id, string Code, decimal LitersUsed);
+
 public sealed record MilkDayDetail(
     int Id,
     string Code,
@@ -14,7 +17,8 @@ public sealed record MilkDayDetail(
     int GoatCount,
     decimal LitersPerGoat,
     string? Notes,
-    IReadOnlyList<MilkedGoat> Goats);
+    IReadOnlyList<MilkedGoat> Goats,
+    MilkDayCheeseBatch? CheeseBatch);
 
 public sealed record MilkPeriod(int Days, decimal Liters, decimal AveragePerDay);
 

@@ -4,19 +4,20 @@ Sistema de gestión ganadera y quesera del negocio familiar en Castaños, Coahui
 
 - **Bovinos:** únicamente para carne; se venden vivos, becerros de unos 8 meses y 150 kg.
 - **Caprinos:** cabritos (en pie o en canal) y leche.
-- **Quesería:** queso canasta, panela y asadero exclusivamente de leche de cabra, trazables hasta su ordeña.
+- **Quesería:** queso canasta y panela de leche de cabra propia, trazables hasta su ordeña; queso asadero de leche de vaca comprado a un proveedor para reventa.
 
 | Ruta | Qué es |
 | --- | --- |
 | `/` | Sitio público: catálogo, pedido y trazabilidad de muestra |
-| `/panel` | Sistema de gestión; disponibles: Hato (`/panel/hato`), Sanidad (`/panel/sanidad`) Reproducción (`/panel/reproduccion`) y Ordeña (`/panel/ordena`) |
+| `/panel` | Sistema de gestión; disponibles: Hato (`/panel/hato`), Sanidad (`/panel/sanidad`) Reproducción (`/panel/reproduccion`), Ordeña (`/panel/ordena`) y Quesería (`/panel/queseria`) |
 | `/api/health` | Health check del backend |
 | `/api/herd/...` | API del módulo Hato ([spec](backend/Modules/Herd/specs/herd.spec.md)) |
 | `/api/animal-health/...` | API del módulo Sanidad ([spec](backend/Modules/AnimalHealth/specs/animal-health.spec.md)) |
 | `/api/reproduction/...` | API del módulo Reproducción ([spec](backend/Modules/Reproduction/specs/reproduction.spec.md)) |
 | `/api/milking/...` | API del módulo Ordeña ([spec](backend/Modules/Milking/specs/milking.spec.md)) |
+| `/api/cheese/...` | API del módulo Quesería ([spec](backend/Modules/Cheese/specs/cheese.spec.md)) |
 
-Estado: esquema de base de datos, identidad visual, sitio público y módulos Hato (animales, razas, lotes, pesajes y becerros para venta) Sanidad (visitas del veterinario, eventos, retiros, medicamentos y laboratorio) Reproducción (montas, diagnóstico de preñez, partos y crías) y Ordeña (ordeña diaria, cabras ordeñadas y lote de leche del día). Siguiente módulo: Quesería. Seguimiento en [odd/tasks/](odd/tasks/).
+Estado: esquema de base de datos, identidad visual, sitio público y módulos Hato (animales, razas, lotes, pesajes y becerros para venta) Sanidad (visitas del veterinario, eventos, retiros, medicamentos y laboratorio) Reproducción (montas, diagnóstico de preñez, partos y crías) Ordeña (ordeña diaria, cabras ordeñadas y lote de leche del día) y Quesería (tandas de canasta y panela, compras de asadero, mermas y existencias). Siguiente módulo: Matanza de cabritos. Seguimiento en [odd/tasks/](odd/tasks/).
 
 Documentos del proyecto: [dominio y reglas de negocio](specs/domain.spec.md), [base de datos](specs/database.spec.md), [sitio público](frontend/src/modules/landing/specs/landing.spec.md), [panel](frontend/src/modules/home/specs/home.spec.md) e [identidad visual](frontend/DESIGN.md).
 
@@ -64,7 +65,7 @@ El script guarda puertos y contraseña PostgreSQL en `.env`. `--project-name tec
 
 ## Base de datos de cada microservicio
 
-El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 48 tablas, 6 vistas, 2 triggers sanitarios y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
+El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 53 tablas, 7 vistas, 7 triggers (sanitarios y de quesería) y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
 
 El backend incluye un DbContext todavía sin entidades; se mapean conforme se construye cada módulo.
 

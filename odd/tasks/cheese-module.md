@@ -43,4 +43,4 @@ Ejecutado el 2026-11-13 con .NET 10.0.404 y PostgreSQL 16 local:
 
 ## Estado y siguientes pasos
 
-Terminado. Siguiente módulo: Matanza de cabritos.
+Terminado. Siguiente módulo: Matanza de cabritos (hecho, ver `slaughter-module.md`).

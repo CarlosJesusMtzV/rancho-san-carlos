@@ -1,0 +1,1 @@
+export { slaughterRoutes } from './routes'

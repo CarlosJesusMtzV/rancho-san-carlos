@@ -7,6 +7,7 @@ using TecNM.Api.Modules.Cheese;
 using TecNM.Api.Modules.Herd;
 using TecNM.Api.Modules.Milking;
 using TecNM.Api.Modules.Reproduction;
+using TecNM.Api.Modules.Slaughter;
 
 const string FrontendCors = "Frontend";
 
@@ -71,6 +72,7 @@ builder.Services.AddScoped<AnimalHealthService>();
 builder.Services.AddScoped<ReproductionService>();
 builder.Services.AddScoped<MilkingService>();
 builder.Services.AddScoped<CheeseService>();
+builder.Services.AddScoped<SlaughterService>();
 builder.Services.AddDbContext<TecNMDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddCors(options => options.AddPolicy(FrontendCors, policy =>
     policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));

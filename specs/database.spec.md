@@ -4,7 +4,7 @@
 
 Contrato del esquema PostgreSQL definido en [`database.sql`](../database.sql). Parte del diseño original `BDPRY.sql` (50 tablas, sintaxis de SQL Server exportada de un diagrama) y lo corrige para PostgreSQL 15 y las convenciones del template.
 
-- 53 tablas, 7 vistas y 7 triggers de reglas sanitarias y de quesería, todo en `snake_case` e inglés.
+- 54 tablas, 7 vistas y 8 triggers de reglas sanitarias, de quesería y de matanza, todo en `snake_case` e inglés.
 - Solo ganado bovino y caprino; reglas de dominio en [`domain.spec.md`](domain.spec.md).
 - Se ejecuta al inicializar un volumen nuevo. No migra bases existentes.
 
@@ -65,7 +65,7 @@ Se conservan en todas las tablas, renombradas:
 | `ProduccionLeche` | `milk_records` | Cabras ordeñadas en cada ordeña; sin litros por cabra (se mide el total del día). Una cabra por ordeña. |
 | — (nueva) | `milk_lots` | Ordeña del día: un lote por fecha con el total de litros; eslabón de la trazabilidad del queso. |
 | — (nueva) | `weight_records` | Historial de pesajes en lugar de un solo peso. |
-| `ProcesoSacrificio` | `kid_slaughters` | Solo cabritos; peso vivo y peso en canal. |
+| `ProcesoSacrificio` | `slaughter_runs`, `kid_slaughters` | Solo cabritos. La jornada guarda el día, el rastro o matancero externo y el pago; cada cabrito, su peso vivo y en canal. |
 | `Despiece` | — (eliminada) | La canal de cabrito se vende entera; los becerros, vivos. |
 | `Departamento` | `departments` |  |
 | `Puesto` | `positions` |  |
@@ -116,7 +116,8 @@ Reglas sanitarias que la base garantiza aunque el backend falle. Lanzan `check_v
 | Trigger | Tabla | Regla |
 | --- | --- | --- |
 | `tg_milk_records_check` | `milk_records` | Solo cabras hembra activas; sin retiro de leche en la fecha de la ordeña (la del lote) |
-| `tg_kid_slaughters_check` | `kid_slaughters` | Sin retiro de carne en la fecha de sacrificio |
+| `tg_kid_slaughters_check` | `kid_slaughters` | Cabrito vigente en el hato, no anterior a su nacimiento y sin retiro de carne en la fecha de la jornada; una canal en un pedido vigente no se quita |
+| `tg_slaughter_runs_check` | `slaughter_runs` | La fecha de la jornada no cambia |
 | `tg_cheese_batches_check` | `cheese_batches` | La ordeña sigue vigente y no cambia; elaboración no anterior a la ordeña; litros usados no mayores a los ordeñados; no se elimina si ya salió queso |
 | `tg_cheese_batch_outputs_check` | `cheese_batch_outputs` | Solo queso propio (`cheese`), piezas enteras, sin bajar de lo ya consumido |
 | `tg_cheese_purchases_check` | `cheese_purchases` | Solo queso de reventa (`resale`), piezas enteras, sin bajar de lo ya consumido |
@@ -139,6 +140,7 @@ Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasita
 | 2 | `2026-11-11-02-reproduccion.sql` | Monta natural en `breeding_events`, `pregnancy_checks`, `birth_events.stillborn_count`, un parto por monta |
 | 3 | `2026-11-11-03-ordena.sql` | Total de litros por día en `milk_lots`, una ordeña por día, `milk_records` sin litros ni hora, trigger y vista de trazabilidad ajustados |
 | 4 | `2026-11-13-04-queseria.sql` | Tandas con presentaciones, compras de asadero, mermas, `v_cheese_stock`, renglones de pedido por presentación o compra, asadero como reventa; se detiene si ya hay queso registrado |
+| 5 | `2026-11-13-05-matanza.sql` | Jornadas de matanza (`slaughter_runs`), `kid_slaughters` ligada a la jornada con peso vivo obligatorio, un cabrito por matanza vigente; se detiene si ya hay matanzas |
 
 Comprobado para cada script: aplicarlo sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` correspondiente (comparación con `pg_dump -s`).
 
@@ -156,7 +158,7 @@ Mapeadas: `species`, `breeds`, `animal_lots`, `animals`, `weight_records` y la v
 Verificado en PostgreSQL 16 local el 2026-11-10 (la imagen del proyecto usa PostgreSQL 15; falta repetirlo con Docker):
 
 1. El script completo corre en una transacción sin errores.
-2. 53 tablas, 7 vistas, 7 triggers, 0 identificadores con mayúsculas.
+2. 54 tablas, 7 vistas, 8 triggers, 0 identificadores con mayúsculas.
 3. Ordeña de cabra aceptada; ordeña de bovino, de macho o de cabra con retiro rechazada; aceptada al terminar el retiro.
 4. Matanza de bovino, de cabrito con retiro o con canal mayor que el peso vivo rechazada; aceptada tras el retiro.
 5. Raza o lote de otra especie y tercera especie rechazados.

@@ -57,6 +57,7 @@ docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-02-reproduccion.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-11-03-ordena.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-04-queseria.sql
+docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-05-matanza.sql
 ```
 
 Para empezar de cero con otro volumen usa otro nombre de proyecto:
@@ -95,7 +96,8 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 4. **Reproducción** también, en https://localhost:5173/panel/reproduccion. Para diagnosticar preñez hace falta una visita del veterinario registrada en Sanidad.
 5. **Ordeña** en https://localhost:5173/panel/ordena: una ordeña al día con el total de litros y las cabras ordeñadas; las que tienen retiro de leche no se pueden marcar.
 6. **Quesería** en https://localhost:5173/panel/queseria: tandas de canasta y panela con la leche de una ordeña, compras de asadero (de proveedor, leche de vaca), mermas y existencias con caducidad.
-7. Siguiente módulo: **Matanza de cabritos**. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
+7. **Matanza de cabritos** en https://localhost:5173/panel/matanza: jornadas en rastro o con matancero, peso vivo y en canal de cada cabrito y canales por vender.
+8. Siguiente módulo: **Ventas**. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
 6. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
 
 ## Problemas comunes

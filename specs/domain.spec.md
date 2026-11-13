@@ -23,7 +23,7 @@ Sistema de gestión del negocio familiar en Castaños, Coahuila. Sustituye por c
 | R8 | Solo se sacrifican cabritos; nunca bovinos. Sin despiece: la canal se vende entera. | Llave compuesta y `ck_kid_slaughters_goats_only` |
 | R9 | Un animal inactivo lleva fecha de salida; un cabrito sacrificado queda `slaughtered`. | `ck_animals_exit`; el estado lo actualiza el servicio de matanza |
 | R10 | No se ordeña una cabra con retiro de leche vigente ni una que ya salió del hato. Una ordeña por día. | `tg_milk_records_check`, `uq_milk_lots_collection_date_active` |
-| R11 | No se sacrifica un cabrito con retiro de carne vigente. | `tg_kid_slaughters_check` |
+| R11 | No se sacrifica un cabrito con retiro de carne vigente, ni uno que ya salió del hato o antes de nacer; cada cabrito una sola vez. | `tg_kid_slaughters_check`, `uq_kid_slaughters_animal_active` |
 | R12 | Un becerro con retiro de carne vigente no se vende. | Servicio de ventas + `v_calf_sale_candidates.meat_allowed_from` (pendiente) |
 | R13 | Una tanda solo produce quesos propios (`cheese`) y una compra solo es de queso de reventa (`resale`); las piezas van en números enteros. | `tg_cheese_batch_outputs_check`, `tg_cheese_purchases_check` |
 | R15 | Las existencias de queso no quedan negativas: mermas y ventas no pasan de lo disponible, y una tanda o compra no baja de lo ya consumido. | `v_cheese_stock`, `tg_cheese_stock_adjustments_check`, `tg_cheese_batch_outputs_check`, `tg_cheese_purchases_check`; ventas: servicio de Ventas (pendiente) |
@@ -57,7 +57,7 @@ El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, s
 | 3 | Reproducción | `breeding_events`, `pregnancy_checks`, `birth_events`, crías en `animals` | Ambas |
 | 4 | Ordeña | `milk_lots`, `milk_records` | Caprino |
 | 5 | Quesería | `products`, `cheese_batches`, `cheese_batch_outputs`, `cheese_purchases`, `cheese_stock_adjustments` | Caprino; asadero de proveedor |
-| 6 | Matanza de cabritos | `kid_slaughters` | Caprino |
+| 6 | Matanza de cabritos | `slaughter_runs`, `kid_slaughters` | Caprino |
 | 7 | Ventas | `customers`, `orders`, `order_items`, `invoices`, `payments`, `shipments` | Ambas |
 | Después | Insumos, compras, RH, equipo, finanzas | Ver `specs/database.spec.md` | — |
 
@@ -112,6 +112,14 @@ Quesería, confirmado el 2026-11-13:
 | Caducidad | Canasta y panela duran de 7 a 11 días: se sugieren 7 y se permite hasta 11. Asadero: 15 días sugeridos. |
 | Inventario | Cada tanda y compra lleva su existencia; se registran mermas, consumo propio y regalos; Ventas descontará lo vendido. |
 
+Matanza de cabritos, confirmado el 2026-11-13:
+
+| Decisión | Resultado |
+| --- | --- |
+| Quién sacrifica | Un rastro o matancero externo; su nombre se escribe en cada jornada (sin catálogo) y se anota el pago total. |
+| Cuántos | Varios cabritos el mismo día, en una sola jornada. |
+| Pesos | Peso vivo y peso en canal de cada cabrito; se calcula el rendimiento en canal. |
+
 Tomadas al diseñar (cambiables sin tocar la base):
 
 | Decisión | Valor |
@@ -121,6 +129,7 @@ Tomadas al diseñar (cambiables sin tocar la base):
 | Raza y lote de la cría | Por omisión los de la madre; se pueden cambiar en el parto |
 | Venta que descuenta existencias | Renglones de pedidos confirmados o entregados |
 | Códigos de quesería | Tanda `QF-AAAAMMDD` (día de la ordeña); compra `CQ-AAAAMMDD` |
+| Canal disponible | Sin renglón en un pedido vigente (no cancelado) |
 
 Pendientes:
 
@@ -132,7 +141,7 @@ Pendientes:
 
 ## Aceptación
 
-1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 53 tablas, 7 vistas y 7 triggers en `snake_case`.
+1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 54 tablas, 7 vistas y 8 triggers en `snake_case`.
 2. Registrar ordeña de un bovino, de un macho o de una cabra con retiro de leche falla en la base de datos.
 3. Registrar la matanza de un bovino o de un cabrito con retiro de carne falla.
 4. Asignar a un animal una raza o lote de otra especie falla.

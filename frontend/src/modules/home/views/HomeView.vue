@@ -11,7 +11,7 @@ const modules: { name: string; scope: string; species: string; to?: string }[] =
   { name: 'Ordeña', scope: 'Ordeña diaria: total de litros, cabras ordeñadas y lote de leche del día.', species: 'Solo caprino', to: '/panel/ordena' },
   { name: 'Quesería', scope: 'Tandas de canasta y panela con la leche del día, compras de asadero de proveedor, mermas y existencias.', species: 'Caprino; asadero de vaca, de proveedor', to: '/panel/queseria' },
   { name: 'Matanza de cabritos', scope: 'Jornadas en rastro o con matancero: peso vivo, canal y rendimiento, solo tras el retiro sanitario.', species: 'Solo caprino', to: '/panel/matanza' },
-  { name: 'Ventas', scope: 'Pedidos de queso, cabritos en pie o en canal y becerros vivos de unos 8 meses y 150 kg.', species: 'Bovino y caprino' },
+  { name: 'Ventas', scope: 'Ventas y encargos de queso, ganado en pie y canal por kilo; cobro al entregar y factura opcional.', species: 'Bovino y caprino', to: '/panel/ventas' },
 ]
 </script>
 

@@ -6,6 +6,7 @@ import { homeRoutes } from '../../modules/home'
 import { cheeseRoutes } from '../../modules/cheese'
 import { milkingRoutes } from '../../modules/milking'
 import { reproductionRoutes } from '../../modules/reproduction'
+import { salesRoutes } from '../../modules/sales'
 import { slaughterRoutes } from '../../modules/slaughter'
 import { landingRoutes } from '../../modules/landing'
 
@@ -18,7 +19,7 @@ const router = createRouter({
     {
       path: '/panel',
       component: () => import('../layouts/MainLayout.vue'),
-      children: [...homeRoutes, ...herdRoutes, ...animalHealthRoutes, ...reproductionRoutes, ...milkingRoutes, ...cheeseRoutes, ...slaughterRoutes],
+      children: [...homeRoutes, ...herdRoutes, ...animalHealthRoutes, ...reproductionRoutes, ...milkingRoutes, ...cheeseRoutes, ...slaughterRoutes, ...salesRoutes],
     },
     {
       path: '/:pathMatch(.*)*',

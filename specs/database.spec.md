@@ -4,7 +4,7 @@
 
 Contrato del esquema PostgreSQL definido en [`database.sql`](../database.sql). Parte del diseño original `BDPRY.sql` (50 tablas, sintaxis de SQL Server exportada de un diagrama) y lo corrige para PostgreSQL 15 y las convenciones del template.
 
-- 54 tablas, 7 vistas y 8 triggers de reglas sanitarias, de quesería y de matanza, todo en `snake_case` e inglés.
+- 54 tablas, 7 vistas y 10 triggers de reglas sanitarias, de quesería, de matanza y de ventas, todo en `snake_case` e inglés.
 - Solo ganado bovino y caprino; reglas de dominio en [`domain.spec.md`](domain.spec.md).
 - Se ejecuta al inicializar un volumen nuevo. No migra bases existentes.
 
@@ -75,10 +75,10 @@ Se conservan en todas las tablas, renombradas:
 | `Capacitacion` | `training_records` |  |
 | `TipoCliente` | `customer_types` |  |
 | `Cliente` | `customers` | RFC opcional (público en general). |
-| `Pedido` | `orders` | `total_pedido` se calcula en `v_order_totals`. |
-| `DetallePedido` | `order_items` | Cantidad decimal (kg); enlaza lote de queso, animal vivo o canal de cabrito. |
-| `Factura` | `invoices` | Valida total = subtotal + impuestos. |
-| `Pago` | `payments` |  |
+| `Pedido` | `orders` | Venta en el momento (`delivered`) o encargo (`confirmed`) que aparta lo vendido; entrega en rancho o a domicilio; `total_pedido` se calcula en `v_order_totals`. |
+| `DetallePedido` | `order_items` | Cantidad decimal; enlaza presentación de tanda, compra de reventa, animal vivo o canal. Ganado y canal por kilo (cantidad = kg). |
+| `Factura` | `invoices` | Opcional, una por pedido; folio fiscal único; valida total = subtotal + impuestos. Sin estado de pago. |
+| `Pago` | `payments` | Del pedido, no de la factura: se cobra completo al entregar; uno vigente por pedido. |
 | `Envio` | `shipments` | Agrega número de guía de tránsito. |
 | `TipoInstalacion` | `facility_types` |  |
 | `Instalacion` | `facilities` |  |
@@ -118,6 +118,8 @@ Reglas sanitarias que la base garantiza aunque el backend falle. Lanzan `check_v
 | `tg_milk_records_check` | `milk_records` | Solo cabras hembra activas; sin retiro de leche en la fecha de la ordeña (la del lote) |
 | `tg_kid_slaughters_check` | `kid_slaughters` | Cabrito vigente en el hato, no anterior a su nacimiento y sin retiro de carne en la fecha de la jornada; una canal en un pedido vigente no se quita |
 | `tg_slaughter_runs_check` | `slaughter_runs` | La fecha de la jornada no cambia |
+| `tg_order_items_check` | `order_items` | Queso de una entrada vigente, sin caducar, del mismo producto y con existencia; ganado activo de la especie del producto y sin retiro de carne; canal vigente; animal o canal en un solo pedido vigente; renglones no editables |
+| `tg_orders_check` | `orders` | Un pedido cancelado no se reactiva |
 | `tg_cheese_batches_check` | `cheese_batches` | La ordeña sigue vigente y no cambia; elaboración no anterior a la ordeña; litros usados no mayores a los ordeñados; no se elimina si ya salió queso |
 | `tg_cheese_batch_outputs_check` | `cheese_batch_outputs` | Solo queso propio (`cheese`), piezas enteras, sin bajar de lo ya consumido |
 | `tg_cheese_purchases_check` | `cheese_purchases` | Solo queso de reventa (`resale`), piezas enteras, sin bajar de lo ya consumido |
@@ -128,7 +130,7 @@ Los de retiro usan `fn_withdrawal_allowed_from(animal, 'milk' \| 'meat', fecha)`
 
 ## Datos iniciales
 
-Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasitante), 4 tipos de producto y 6 productos. No se cargan usuarios, animales ni datos personales.
+Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasitante), 4 tipos de producto, 6 productos y 3 tipos de cliente. No se cargan usuarios, animales ni datos personales.
 
 ## Cambios a bases existentes
 
@@ -141,6 +143,7 @@ Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasita
 | 3 | `2026-11-11-03-ordena.sql` | Total de litros por día en `milk_lots`, una ordeña por día, `milk_records` sin litros ni hora, trigger y vista de trazabilidad ajustados |
 | 4 | `2026-11-13-04-queseria.sql` | Tandas con presentaciones, compras de asadero, mermas, `v_cheese_stock`, renglones de pedido por presentación o compra, asadero como reventa; se detiene si ya hay queso registrado |
 | 5 | `2026-11-13-05-matanza.sql` | Jornadas de matanza (`slaughter_runs`), `kid_slaughters` ligada a la jornada con peso vivo obligatorio, un cabrito por matanza vigente; se detiene si ya hay matanzas |
+| 6 | `2026-11-13-06-ventas.sql` | Encargos y entrega en `orders`, ganado y canal por kilo, pago por pedido, factura sin estado de pago, `tg_order_items_check`, `tg_orders_check`, tipos de cliente; se detiene si ya hay ventas |
 
 Comprobado para cada script: aplicarlo sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` correspondiente (comparación con `pg_dump -s`).
 
@@ -158,7 +161,7 @@ Mapeadas: `species`, `breeds`, `animal_lots`, `animals`, `weight_records` y la v
 Verificado en PostgreSQL 16 local el 2026-11-10 (la imagen del proyecto usa PostgreSQL 15; falta repetirlo con Docker):
 
 1. El script completo corre en una transacción sin errores.
-2. 54 tablas, 7 vistas, 8 triggers, 0 identificadores con mayúsculas.
+2. 54 tablas, 7 vistas, 10 triggers, 0 identificadores con mayúsculas.
 3. Ordeña de cabra aceptada; ordeña de bovino, de macho o de cabra con retiro rechazada; aceptada al terminar el retiro.
 4. Matanza de bovino, de cabrito con retiro o con canal mayor que el peso vivo rechazada; aceptada tras el retiro.
 5. Raza o lote de otra especie y tercera especie rechazados.

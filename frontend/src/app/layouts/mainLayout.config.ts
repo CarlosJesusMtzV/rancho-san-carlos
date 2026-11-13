@@ -17,6 +17,7 @@ export const headerNavigation: NavigationItem[] = [
   { label: 'Ordeña', to: '/panel/ordena' },
   { label: 'Quesería', to: '/panel/queseria' },
   { label: 'Matanza', to: '/panel/matanza' },
+  { label: 'Ventas', to: '/panel/ventas' },
   { label: 'Sitio público', to: '/' },
 ]
 
@@ -61,5 +62,13 @@ export const sidebarNavigation: NavigationItem[] = [
     ],
   },
   { label: 'Matanza de cabritos', to: '/panel/matanza' },
+  {
+    label: 'Ventas',
+    children: [
+      { label: 'Pedidos', to: '/panel/ventas' },
+      { label: 'Nueva venta', to: '/panel/ventas/nueva' },
+      { label: 'Clientes', to: '/panel/ventas/clientes' },
+    ],
+  },
   { label: 'Sitio público', to: '/' },
 ]

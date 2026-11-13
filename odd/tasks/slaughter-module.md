@@ -34,10 +34,10 @@ Ejecutado el 2026-11-13 con .NET 10.0.404 y PostgreSQL 16 local:
 - Esquema: 54 tablas, 7 vistas, 8 triggers; 16 comprobaciones SQL (cabrito repetido, bovino, retiro de carne, animal muerto, canal más pesada, sin peso vivo, pago negativo, fecha fija, antes de nacer, canal en pedido vigente o cancelado).
 - Migración: sobre el esquema de `main` deja el mismo esquema que `database.sql` (`pg_dump -s`); con una matanza previa se detiene sin cambios.
 - `dotnet build`: 0 errores, 0 advertencias. `npm run build` y `check-layout` correctos.
-- API real: 33 comprobaciones de los 7 criterios de aceptación, sin 500. Regresión de API: Hato 40, Sanidad 37, Reproducción 34, Ordeña 19 y Quesería 54, sin fallas.
+- API real: 30 comprobaciones de los 7 criterios de aceptación, sin 500. Regresión de API: Hato 40, Sanidad 37, Reproducción 34, Ordeña 19 y Quesería 54, sin fallas.
 - Navegador contra la API real: Matanza 17/17 (incluidos 375 px y tema oscuro); regresión Hato 34/34, Sanidad 35/35, Reproducción 22/22, Ordeña 24/24 y Quesería 42/42, sin errores de consola.
 - **No verificado:** Docker Compose con PostgreSQL 15.
 
 ## Estado y siguientes pasos
 
-Terminado. Siguiente módulo: Ventas.
+Terminado. Siguiente módulo: Ventas (hecho, ver `sales-module.md`).

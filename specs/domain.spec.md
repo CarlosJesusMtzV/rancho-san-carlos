@@ -19,17 +19,16 @@ Sistema de gestión del negocio familiar en Castaños, Coahuila. Sustituye por c
 | R4 | Solo se ordeñan cabras hembra. Canasta y panela son de leche de cabra propia; el asadero se compra hecho (leche de vaca) y no se elabora ni se presenta como propio. | `ck_milk_records_goats_only`, llave compuesta `(animal_id, species_id)`, `tg_milk_records_check` |
 | R5 | La raza y el lote de un animal son de su misma especie. | Llaves compuestas en `animals` |
 | R6 | Toda tanda de queso proviene de la leche de un solo día, con una tanda por día y sin usar más litros de los ordeñados. | `cheese_batches.milk_lot_id NOT NULL`, `uq_cheese_batches_milk_lot_active`, `tg_cheese_batches_check`, `tg_milk_lots_cheese_check` |
-| R7 | Un animal vivo o una canal se venden una sola vez. | `uq_order_items_animal_active`, `uq_order_items_kid_slaughter_active` |
+| R7 | Un animal vivo o una canal están en un solo pedido vigente (no cancelado). | `tg_order_items_check` |
 | R8 | Solo se sacrifican cabritos; nunca bovinos. Sin despiece: la canal se vende entera. | Llave compuesta y `ck_kid_slaughters_goats_only` |
 | R9 | Un animal inactivo lleva fecha de salida; un cabrito sacrificado queda `slaughtered`. | `ck_animals_exit`; el estado lo actualiza el servicio de matanza |
 | R10 | No se ordeña una cabra con retiro de leche vigente ni una que ya salió del hato. Una ordeña por día. | `tg_milk_records_check`, `uq_milk_lots_collection_date_active` |
 | R11 | No se sacrifica un cabrito con retiro de carne vigente, ni uno que ya salió del hato o antes de nacer; cada cabrito una sola vez. | `tg_kid_slaughters_check`, `uq_kid_slaughters_animal_active` |
-| R12 | Un becerro con retiro de carne vigente no se vende. | Servicio de ventas + `v_calf_sale_candidates.meat_allowed_from` (pendiente) |
+| R12 | Un animal en pie con retiro de carne vigente no se vende, ni un cabrito apartado se sacrifica. | `tg_order_items_check`, `tg_kid_slaughters_check` |
 | R13 | Una tanda solo produce quesos propios (`cheese`) y una compra solo es de queso de reventa (`resale`); las piezas van en números enteros. | `tg_cheese_batch_outputs_check`, `tg_cheese_purchases_check` |
 | R15 | Las existencias de queso no quedan negativas: mermas y ventas no pasan de lo disponible, y una tanda o compra no baja de lo ya consumido. | `v_cheese_stock`, `tg_cheese_stock_adjustments_check`, `tg_cheese_batch_outputs_check`, `tg_cheese_purchases_check`; ventas: servicio de Ventas (pendiente) |
-| R14 | Una canal se vende con el producto `CAB-CAN`; un animal vivo con `GAN-CAB` o `GAN-BEC`. | Servicio de ventas (pendiente) |
+| R14 | Una canal se vende con `CAB-CAN`; un animal vivo con el producto de su especie (`GAN-BEC` bovino, `GAN-CAB` caprino); el queso con el producto de su tanda o compra y sin caducar. | `tg_order_items_check` |
 
-Las reglas R12 a R14 no están en la base de datos: se implementan y prueban en los servicios de cada módulo.
 
 ### Meta de venta de becerros
 
@@ -42,9 +41,9 @@ Edad promedio de 8 meses y peso aproximado de 150 kg. `v_calf_sale_candidates` m
 | `QSO-CAN` | Queso Canasta de Cabra | kg | $120 MXN/kg | Rueda de 4.5 kg ($540) o 5 kg ($600) |
 | `QSO-PAN` | Queso Panela Artesanal | pieza | $120 MXN | Pieza de 1 kg; mismo queso que el canasta, en otro molde |
 | `QSO-ASA` | Queso Asadero | pieza | $80 MXN | Pieza de 500 g; leche de vaca, de proveedor (reventa) |
-| `GAN-CAB` | Cabrito en pie | cabeza | Cotización | Ejemplar o lote |
-| `CAB-CAN` | Cabrito en canal | pieza | Cotización | Sacrificado y pelado, canal entera |
-| `GAN-BEC` | Becerro en pie | cabeza | Cotización | ~8 meses y ~150 kg |
+| `GAN-CAB` | Cabrito en pie | kg | Por kilo en pie, en cada venta | Se pesa al vender |
+| `CAB-CAN` | Cabrito en canal | kg | Por kilo de canal, en cada venta | Sacrificado y pelado, canal entera |
+| `GAN-BEC` | Becerro en pie | kg | Por kilo en pie, en cada venta | ~8 meses y ~150 kg |
 
 El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, se repite en `frontend/src/modules/landing/data/catalog.ts`. Cambiar un precio obliga a cambiar ambos. El sitio presenta el asadero como queso de proveedor y de leche de vaca.
 
@@ -58,7 +57,7 @@ El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, s
 | 4 | Ordeña | `milk_lots`, `milk_records` | Caprino |
 | 5 | Quesería | `products`, `cheese_batches`, `cheese_batch_outputs`, `cheese_purchases`, `cheese_stock_adjustments` | Caprino; asadero de proveedor |
 | 6 | Matanza de cabritos | `slaughter_runs`, `kid_slaughters` | Caprino |
-| 7 | Ventas | `customers`, `orders`, `order_items`, `invoices`, `payments`, `shipments` | Ambas |
+| 7 | Ventas | `customers`, `orders`, `order_items`, `invoices`, `payments` (`shipments` queda para Equipo) | Ambas |
 | Después | Insumos, compras, RH, equipo, finanzas | Ver `specs/database.spec.md` | — |
 
 Cada módulo se construye como vertical slice con su propia spec en `backend/Modules/<Feature>/specs/` y `frontend/src/modules/<feature>/specs/`.
@@ -120,6 +119,17 @@ Matanza de cabritos, confirmado el 2026-11-13:
 | Cuántos | Varios cabritos el mismo día, en una sola jornada. |
 | Pesos | Peso vivo y peso en canal de cada cabrito; se calcula el rendimiento en canal. |
 
+Ventas, confirmado el 2026-11-13:
+
+| Decisión | Resultado |
+| --- | --- |
+| Clientes | Clientes fijos (restaurantes, tiendas) y compradores de ganado. |
+| Pago | Siempre al momento de entregar; no hay cuentas por cobrar. |
+| Factura | A veces: se anota el folio fiscal; el sistema no timbra. |
+| Precio del ganado | Becerros y cabritos en pie por kilo en pie; cabrito en canal por kilo de canal. |
+| Encargos | A veces encargan: el pedido aparta lo vendido y se entrega y cobra después. |
+| Entregas | El queso se entrega a domicilio a veces; el ganado lo recogen los compradores. |
+
 Tomadas al diseñar (cambiables sin tocar la base):
 
 | Decisión | Valor |
@@ -130,18 +140,20 @@ Tomadas al diseñar (cambiables sin tocar la base):
 | Venta que descuenta existencias | Renglones de pedidos confirmados o entregados |
 | Códigos de quesería | Tanda `QF-AAAAMMDD` (día de la ordeña); compra `CQ-AAAAMMDD` |
 | Canal disponible | Sin renglón en un pedido vigente (no cancelado) |
+| Queso caducado | No se vende; se registra como merma |
+| Impuestos de la factura | 0 por omisión (alimentos y ganado a tasa 0); se pueden indicar |
 
 Pendientes:
 
 | Decisión | Estado |
 | --- | --- |
 | Precios: $120/kg canasta, $120 panela, $80 asadero | Tomados del sitio; confirmar. El precio de compra del asadero se registra en cada compra. |
-| Precio de referencia de cabrito en pie, en canal y becerro | Sin definir; hoy se cotizan |
+| Precio de referencia por kilo de cabrito en pie, en canal y becerro | Sin definir; se pone en cada venta |
 | Autenticación y roles del panel | Sin definir; la plantilla ya no trae login |
 
 ## Aceptación
 
-1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 54 tablas, 7 vistas y 8 triggers en `snake_case`.
+1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 54 tablas, 7 vistas y 10 triggers en `snake_case`.
 2. Registrar ordeña de un bovino, de un macho o de una cabra con retiro de leche falla en la base de datos.
 3. Registrar la matanza de un bovino o de un cabrito con retiro de carne falla.
 4. Asignar a un animal una raza o lote de otra especie falla.

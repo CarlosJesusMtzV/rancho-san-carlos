@@ -26,24 +26,3 @@ public sealed class KidSlaughterConfiguration : IEntityTypeConfiguration<KidSlau
         builder.HasQueryFilter(kid => kid.DeletedAt == null);
     }
 }
-
-public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
-{
-    public void Configure(EntityTypeBuilder<Order> builder)
-    {
-        builder.ToTable("orders");
-        builder.HasQueryFilter(order => order.DeletedAt == null);
-    }
-}
-
-public sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
-{
-    public void Configure(EntityTypeBuilder<OrderItem> builder)
-    {
-        builder.ToTable("order_items");
-        builder.Property(item => item.Quantity).HasPrecision(10, 3);
-        builder.Property(item => item.UnitPrice).HasPrecision(10, 2);
-        builder.HasOne(item => item.Order).WithMany().HasForeignKey(item => item.OrderId);
-        builder.HasQueryFilter(item => item.DeletedAt == null);
-    }
-}

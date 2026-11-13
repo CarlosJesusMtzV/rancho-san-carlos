@@ -62,7 +62,8 @@ public sealed class MilkingService(TecNMDbContext db)
             .OrderBy(record => record.Animal.VisualTag)
             .Select(record => new MilkedGoat(record.AnimalId, record.Animal.VisualTag))
             .ToList();
-        return new MilkDayDetail(lot.Id, lot.Code, lot.CollectionDate, lot.TotalLiters, goats.Count, PerGoat(lot.TotalLiters, goats.Count), lot.Notes, goats);
+        var batch = await CheeseBatchAsync(lot.Id, cancellationToken);
+        return new MilkDayDetail(lot.Id, lot.Code, lot.CollectionDate, lot.TotalLiters, goats.Count, PerGoat(lot.TotalLiters, goats.Count), lot.Notes, goats, batch);
     }
 
     public async Task<MilkDayDetail> CreateDayAsync(CreateMilkDayRequest request, CancellationToken cancellationToken)
@@ -101,6 +102,12 @@ public sealed class MilkingService(TecNMDbContext db)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken)
             ?? throw ApiException.NotFound("La ordeña no existe.");
 
+        var batch = await CheeseBatchAsync(lot.Id, cancellationToken);
+        if (batch is not null && liters < batch.LitersUsed)
+        {
+            throw ApiException.Unprocessable($"La tanda {batch.Code} usó {batch.LitersUsed:0.##} L de esta ordeña; el total no puede ser menor.");
+        }
+
         var current = lot.Records.Select(record => record.AnimalId).ToHashSet();
         var added = goatIds.Where(goatId => !current.Contains(goatId)).ToList();
         await EnsureGoatsCanBeMilkedAsync(added, lot.CollectionDate, cancellationToken);
@@ -124,6 +131,12 @@ public sealed class MilkingService(TecNMDbContext db)
         var lot = await db.MilkLots.Include(item => item.Records)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken)
             ?? throw ApiException.NotFound("La ordeña no existe.");
+
+        var batch = await CheeseBatchAsync(lot.Id, cancellationToken);
+        if (batch is not null)
+        {
+            throw ApiException.Conflict($"La leche de esta ordeña se usó en la tanda {batch.Code}; elimina la tanda primero en Quesería.");
+        }
 
         var now = DateTime.UtcNow;
         lot.DeletedAt = now;
@@ -272,6 +285,12 @@ public sealed class MilkingService(TecNMDbContext db)
 
         return $"{code}-{suffix}";
     }
+
+    private Task<MilkDayCheeseBatch?> CheeseBatchAsync(int milkLotId, CancellationToken cancellationToken) =>
+        db.CheeseBatches.AsNoTracking()
+            .Where(batch => batch.MilkLotId == milkLotId)
+            .Select(batch => new MilkDayCheeseBatch(batch.Id, batch.Code, batch.LitersUsed))
+            .FirstOrDefaultAsync(cancellationToken);
 
     private static decimal PerGoat(decimal liters, int goats) => goats == 0 ? 0 : decimal.Round(liters / goats, 2);
 }

@@ -99,17 +99,25 @@ onMounted(load)
     <UiLoadError v-if="error" :message="error" @retry="load" />
     <p v-else-if="!day" aria-busy="true">Cargando…</p>
 
-    <UiCard v-else title="Datos de la ordeña" description="La fecha no cambia; si fue otro día, elimínala y regístrala de nuevo.">
-      <form class="stack" novalidate @submit.prevent="save">
-        <div class="panel-form">
-          <UiField v-model="form.liters" label="Total de litros *" type="number" min="0.01" max="2000" step="0.01" inputmode="decimal" required />
-          <UiField v-model="form.notes" label="Notas" maxlength="255" />
-        </div>
-        <GoatChecklist v-model="form.goatIds" :goats="goats" :date="day.collectionDate" />
-        <UiAlert v-if="saveError" tone="danger" title="No se guardó">{{ saveError }}</UiAlert>
-        <div class="panel-actions"><UiButton type="submit" :loading="saving">Guardar cambios</UiButton></div>
-      </form>
-    </UiCard>
+    <div v-else class="stack">
+      <UiAlert v-if="day.cheeseBatch" tone="info" title="Leche usada en quesería">
+        La tanda <RouterLink class="panel-link" :to="{ name: 'cheese-batch', params: { id: day.cheeseBatch.id } }">{{ day.cheeseBatch.code }}</RouterLink>
+        usó {{ day.cheeseBatch.litersUsed }} L de esta ordeña: el total no puede ser menor y la ordeña no se elimina mientras exista la tanda.
+      </UiAlert>
+      <p v-else><RouterLink class="panel-link" :to="{ name: 'cheese-batch-new', query: { ordena: day.id } }">Hacer tanda de queso con esta leche</RouterLink></p>
+
+      <UiCard title="Datos de la ordeña" description="La fecha no cambia; si fue otro día, elimínala y regístrala de nuevo.">
+        <form class="stack" novalidate @submit.prevent="save">
+          <div class="panel-form">
+            <UiField v-model="form.liters" label="Total de litros *" type="number" min="0.01" max="2000" step="0.01" inputmode="decimal" required />
+            <UiField v-model="form.notes" label="Notas" maxlength="255" />
+          </div>
+          <GoatChecklist v-model="form.goatIds" :goats="goats" :date="day.collectionDate" />
+          <UiAlert v-if="saveError" tone="danger" title="No se guardó">{{ saveError }}</UiAlert>
+          <div class="panel-actions"><UiButton type="submit" :loading="saving">Guardar cambios</UiButton></div>
+        </form>
+      </UiCard>
+    </div>
 
     <UiDialog v-model="deleteOpen" title="Eliminar ordeña">
       <p v-if="day">Se eliminará la ordeña del {{ formatDate(day.collectionDate) }} ({{ day.totalLiters }} L). El día quedará libre para registrarla de nuevo.</p>

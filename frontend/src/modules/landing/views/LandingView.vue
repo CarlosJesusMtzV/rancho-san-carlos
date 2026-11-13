@@ -65,7 +65,7 @@ const year = new Date().getFullYear()
           <h1>Nuestra raíz es el monte y el molde.</h1>
           <p>
             Una ganadería y una quesería que nacen del carácter del semidesierto coahuilense: vacas criadas para
-            carne, chivas que dan cabritos y la leche con la que hacemos queso canasta, panela y asadero.
+            carne y chivas que dan cabritos y la leche con la que hacemos queso canasta y panela.
           </p>
           <div class="lp-hero-actions">
             <RouterLink class="lp-btn lp-btn--ocre" :to="{ hash: '#productos' }">Ver quesos, cabritos y becerros</RouterLink>
@@ -83,8 +83,9 @@ const year = new Date().getFullYear()
             En <strong>Rancho San Carlos</strong> criamos <strong>becerros</strong> para carne, que vendemos vivos, y
             <strong>cabritos</strong>, en pie o en canal, en el semidesierto de Castaños, Coahuila. Solo con la leche de
             nuestras cabras, en
-            <strong>La Cremería San Carlos</strong> elaboramos a diario <strong>queso canasta</strong>,
-            <strong>queso panela</strong> y <strong>queso asadero</strong>.
+            <strong>La Cremería San Carlos</strong> elaboramos <strong>queso canasta</strong> y
+            <strong>queso panela</strong>. También vendemos <strong>queso asadero</strong> de leche de vaca, que
+            compramos a un proveedor.
           </p>
           <p class="lp-quote">«El sabor auténtico del rancho en cada canasta.»</p>
         </div>
@@ -93,7 +94,7 @@ const year = new Date().getFullYear()
       <section id="productos" class="lp-section lp-wide">
         <div class="lp-section-head">
           <h2>Nuestros productos</h2>
-          <p>Quesos elaborados cada mañana en nuestra cremería y ganado criado con control sanitario en los corrales y agostaderos del rancho.</p>
+          <p>Queso canasta y panela de nuestra cremería, queso asadero de proveedor y ganado criado con control sanitario en los corrales y agostaderos del rancho.</p>
         </div>
         <ProductCatalog v-model="catalogFilter" @add="addToOrder" />
       </section>
@@ -105,8 +106,8 @@ const year = new Date().getFullYear()
             <h2>El arte del molde y la paila</h2>
             <p class="lp-accent-text lp-accent-text--terracota">«Moldeado a mano cada mañana con leche de nuestro propio hato»</p>
             <p>
-              Respetamos los tiempos naturales de la leche de cabra recién ordeñada. De ese proceso salen tres
-              especialidades que distinguen a Castaños: el queso canasta, el panela fresco y el asadero.
+              Respetamos los tiempos naturales de la leche de cabra recién ordeñada. De ese proceso sale nuestro
+              queso fresco, que toma dos formas según el molde: el queso canasta y el panela.
             </p>
             <p>
               Cada rueda de queso canasta se prensa a mano dentro de cestos tradicionales, que dejan grabada en la
@@ -180,7 +181,7 @@ const year = new Date().getFullYear()
           <span class="lp-cobrand-divider" aria-hidden="true" />
           <div class="lp-cobrand-second">
             <p class="lp-cobrand-title">LA CREMERÍA SAN CARLOS</p>
-            <p class="lp-cobrand-sub">Queso canasta, panela y asadero de cabra · Producido en Rancho San Carlos</p>
+            <p class="lp-cobrand-sub">Queso canasta y panela de cabra · Producido en Rancho San Carlos</p>
           </div>
         </div>
 
@@ -204,7 +205,7 @@ const year = new Date().getFullYear()
             <ul>
               <li>Queso canasta: rueda de 4.5 kg y de 5 kg</li>
               <li>Queso panela: pieza de 1 kg</li>
-              <li>Queso asadero: pieza de 500 g</li>
+              <li>Queso asadero (de proveedor): pieza de 500 g</li>
               <li>Cabrito: en pie o en canal</li>
               <li>Becerro: en pie, ~8 meses y ~150 kg</li>
             </ul>

@@ -15,6 +15,7 @@ export const headerNavigation: NavigationItem[] = [
   { label: 'Sanidad', to: '/panel/sanidad' },
   { label: 'Reproducción', to: '/panel/reproduccion' },
   { label: 'Ordeña', to: '/panel/ordena' },
+  { label: 'Quesería', to: '/panel/queseria' },
   { label: 'Sitio público', to: '/' },
 ]
 
@@ -49,5 +50,14 @@ export const sidebarNavigation: NavigationItem[] = [
     ],
   },
   { label: 'Ordeña', to: '/panel/ordena' },
+  {
+    label: 'Quesería',
+    children: [
+      { label: 'Existencias', to: '/panel/queseria' },
+      { label: 'Registrar tanda', to: '/panel/queseria/tandas/nueva' },
+      { label: 'Comprar asadero', to: '/panel/queseria/compras/nueva' },
+      { label: 'Historial', to: '/panel/queseria/historial' },
+    ],
+  },
   { label: 'Sitio público', to: '/' },
 ]

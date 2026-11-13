@@ -39,4 +39,4 @@ Ejecutado el 2026-11-11 con .NET 10.0.404 y PostgreSQL 16 local:
 
 ## Estado y siguientes pasos
 
-Terminado. Siguiente módulo: Quesería.
+Terminado. Siguiente módulo: Quesería (hecho, ver `cheese-module.md`).

@@ -24,6 +24,14 @@ public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> opti
     public DbSet<BirthEvent> BirthEvents => Set<BirthEvent>();
     public DbSet<MilkLot> MilkLots => Set<MilkLot>();
     public DbSet<MilkRecord> MilkRecords => Set<MilkRecord>();
+    public DbSet<ProductType> ProductTypes => Set<ProductType>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<CheeseBatch> CheeseBatches => Set<CheeseBatch>();
+    public DbSet<CheeseBatchOutput> CheeseBatchOutputs => Set<CheeseBatchOutput>();
+    public DbSet<CheesePurchase> CheesePurchases => Set<CheesePurchase>();
+    public DbSet<CheeseStockAdjustment> CheeseStockAdjustments => Set<CheeseStockAdjustment>();
+    public DbSet<CheeseStock> CheeseStock => Set<CheeseStock>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -15,7 +15,7 @@ export const traceSamples: TraceRecord[] = [
       { label: 'Ingredientes', value: 'Leche entera de cabra, cuajo y sal' },
       { label: 'Proceso', value: 'Cuajado lento y prensado a mano en molde de canasta' },
       { label: 'Conservación', value: 'Refrigeración de 2 °C a 6 °C' },
-      { label: 'Elaboración y caducidad', value: '14/10/2026 · 14/11/2026' },
+      { label: 'Elaboración y caducidad', value: '06/11/2026 · 13/11/2026' },
     ],
   },
   {

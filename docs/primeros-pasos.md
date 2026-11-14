@@ -15,7 +15,7 @@ Dos formas de ver el proyecto. Empieza por la A: es la más rápida y basta para
 
 ## A. Solo el frontend (5 minutos)
 
-El sitio público y el panel no llaman a la API todavía, así que funcionan sin backend ni base de datos.
+Sirve para ver el sitio público y el diseño del panel. Las pantallas del panel necesitan la API: sin ella muestran que no hay conexión. Para probar los módulos usa la opción B.
 
 ```bash
 cd /c/rancho-san-carlos-proyecto/rancho-san-carlos/frontend
@@ -31,7 +31,7 @@ Con Docker Desktop abierto, desde **Git Bash**:
 
 ```bash
 cd /c/rancho-san-carlos-proyecto/rancho-san-carlos
-python scripts/setup-dev.py --project-name rancho-san-carlos
+python scripts/setup-dev.py --project-name tecnm-rancho-san-carlos
 ```
 
 En Windows se usa `python` en lugar de `bash scripts/setup-dev.sh`, porque ese script busca `python3` y Windows suele instalarlo como `python`.
@@ -64,7 +64,7 @@ docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1
 Para empezar de cero con otro volumen usa otro nombre de proyecto:
 
 ```bash
-python scripts/setup-dev.py --project-name rancho-prueba --frontend-port 5180 --backend-port 7010
+python scripts/setup-dev.py --project-name tecnm-rancho-prueba --frontend-port 5180 --backend-port 7010
 ```
 
 Detener: `docker compose stop`. Volver a arrancar: `docker compose up -d --wait`.
@@ -72,7 +72,7 @@ Detener: `docker compose stop`. Volver a arrancar: `docker compose up -d --wait`
 ## Seguridad
 
 - El script de arranque guarda los puertos y una contraseña de PostgreSQL generada al azar en `.env`. Ese archivo es solo de tu equipo: **nunca lo subas**.
-- `--project-name rancho-san-carlos` separa contenedores y volumen de otros proyectos con la misma plantilla. Usa siempre el mismo nombre para conservar tus datos.
+- `--project-name tecnm-rancho-san-carlos` (siempre empieza con `tecnm-`) separa contenedores y volumen de otros proyectos con la misma plantilla. Usa siempre el mismo nombre para conservar tus datos.
 - Si un puerto está ocupado, el script lo avisa antes de construir o arrancar.
 - No subas secretos, credenciales, datos personales, `.env`, llaves o certificados TLS (`.docker/certs/`) ni respaldos de la base. `.gitignore` ya los excluye; no lo fuerces con `git add -f`.
 - Para documentar configuración usa los `.env.example` saneados, con valores vacíos o de ejemplo.
@@ -100,7 +100,7 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 7. **Matanza de cabritos** en https://localhost:5173/panel/matanza: jornadas en rastro o con matancero, peso vivo y en canal de cada cabrito y canales por vender.
 8. **Ventas** en https://localhost:5173/panel/ventas: clientes, ventas en el momento y encargos de queso, ganado en pie y canal por kilo; cobro al entregar y factura opcional.
 9. Siguiente: página pública de trazabilidad con datos reales. Su spec va en `backend/Modules/<Modulo>/specs/` antes del código (flujo en `CONTRIBUTING.md`).
-6. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
+10. Coloca las fotos en `frontend/public/img/` con los nombres de `frontend/src/modules/landing/specs/landing.spec.md`.
 
 ## Problemas comunes
 
@@ -108,5 +108,6 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 | --- | --- |
 | `python3: command not found` o se abre la Microsoft Store | Usa `python scripts/setup-dev.py`; en Windows desactiva los «alias de ejecución de aplicaciones» de Python |
 | `Falta docker` o `Cannot connect to the Docker daemon` | Abre Docker Desktop y espera a que diga «Engine running» |
+| `argument --project-name: Usa un nombre como tecnm-servicio` | El nombre debe empezar con `tecnm-`, por ejemplo `--project-name tecnm-rancho-prueba` |
 | Puerto 5173 o 7001 ocupado | Agrega `--frontend-port 5180 --backend-port 7010` |
 | `$'\r': command not found` al correr un `.sh` | El archivo tomó finales de línea de Windows; `.gitattributes` lo evita en clones nuevos. Arreglo: `sed -i 's/\r$//' scripts/*.sh` |

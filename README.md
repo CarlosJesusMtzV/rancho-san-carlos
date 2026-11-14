@@ -26,7 +26,7 @@ Documentos del proyecto: [dominio y reglas de negocio](specs/domain.spec.md), [b
 En Windows, sigue [primeros pasos](docs/primeros-pasos.md). Para arrancar con contenedores propios:
 
 ```bash
-bash scripts/setup-dev.sh --project-name rancho-san-carlos
+bash scripts/setup-dev.sh --project-name tecnm-rancho-san-carlos
 ```
 
 Lo que sigue es la documentación de la plantilla base, que continúa vigente salvo donde se indica.

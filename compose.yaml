@@ -34,6 +34,9 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__KeyPath: /https/localhost.key
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=tecnm_template;Username=tecnm_app;Password=${TECNM_DB_PASSWORD:?Ejecuta scripts/setup-dev.sh primero}
       Cors__AllowedOrigins: https://localhost:${TECNM_FRONTEND_PORT:-5173},https://127.0.0.1:${TECNM_FRONTEND_PORT:-5173}
+      # Primer dueño del panel: solo se usa si aún no hay cuentas.
+      Bootstrap__OwnerUsername: ${TECNM_OWNER_USERNAME:-}
+      Bootstrap__OwnerPassword: ${TECNM_OWNER_PASSWORD:-}
     ports:
       - "127.0.0.1:${TECNM_BACKEND_PORT:-7001}:8081"
     volumes:

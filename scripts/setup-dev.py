@@ -15,7 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE = ROOT / '.env'
 KEYS = ('COMPOSE_PROJECT_NAME', 'TECNM_FRONTEND_PORT', 'TECNM_BACKEND_PORT',
-        'TECNM_DB_PASSWORD')
+        'TECNM_DB_PASSWORD', 'TECNM_OWNER_USERNAME', 'TECNM_OWNER_PASSWORD')
 
 
 def read_settings():
@@ -181,6 +181,9 @@ def main():
     settings.update(COMPOSE_PROJECT_NAME=args.project_name, TECNM_FRONTEND_PORT=str(ports['frontend']),
                     TECNM_BACKEND_PORT=str(ports['backend']))
     settings['TECNM_DB_PASSWORD'] = settings.get('TECNM_DB_PASSWORD') or secrets.token_hex(24)
+    # Primer dueño del panel: la API lo crea solo si aún no hay cuentas; la contraseña es temporal.
+    settings['TECNM_OWNER_USERNAME'] = settings.get('TECNM_OWNER_USERNAME') or 'dueno'
+    settings['TECNM_OWNER_PASSWORD'] = settings.get('TECNM_OWNER_PASSWORD') or 'rsc' + secrets.token_hex(6)
     write_settings(settings)
     certificates()
     environment = dict(os.environ, **{key: settings[key] for key in KEYS})
@@ -206,7 +209,10 @@ def main():
           '  PostgreSQL: db:5432, accesible solo desde la red de datos del backend.\n'
           '  database.sql: se ejecuta solo al inicializar un volumen nuevo.\n'
           '  Detener: docker compose stop\n  Logs: docker compose logs -f\n'
-          '  HTTPS local usa un certificado autofirmado.')
+          '  HTTPS local usa un certificado autofirmado.\n'
+          f"  Panel: https://localhost:{ports['frontend']}/panel\n"
+          f"  Primer acceso: usuario {settings['TECNM_OWNER_USERNAME']}, contraseña temporal {settings['TECNM_OWNER_PASSWORD']}\n"
+          '  (solo sirve mientras no existan cuentas; el panel pide cambiarla al entrar).')
     return 0
 
 

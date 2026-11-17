@@ -65,6 +65,9 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
     private static string TitleFor(int status) => status switch
     {
         400 => "Datos inválidos",
+        401 => "Sin sesión",
+        403 => "Sin permiso",
+        423 => "Cuenta bloqueada",
         404 => "No encontrado",
         409 => "Conflicto",
         422 => "Regla de negocio",

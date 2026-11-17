@@ -2,11 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using TecNM.Api.Core;
 using TecNM.Api.Core.Entities;
 using TecNM.Api.Core.Errors;
+using TecNM.Api.Core.Security;
 using TecNM.Api.Data;
 
 namespace TecNM.Api.Modules.AnimalHealth;
 
-public sealed class AnimalHealthService(TecNMDbContext db)
+public sealed class AnimalHealthService(TecNMDbContext db, ICurrentUser currentUser)
 {
     private const int MaxAnimalsPerRecord = 500;
     private const int MaxTreatments = 10;
@@ -120,15 +121,17 @@ public sealed class AnimalHealthService(TecNMDbContext db)
             visits = visits.Where(visit => visit.VisitDate <= end);
         }
 
+        // Los importes de la visita son pagos: solo se muestran con payments.view.
+        var showAmounts = currentUser.Has(Permissions.PaymentsView);
         return await visits
             .OrderByDescending(visit => visit.VisitDate).ThenByDescending(visit => visit.Id)
             .Select(visit => new VetVisitSummary(
                 visit.Id,
                 visit.VisitDate,
                 visit.VetName,
-                visit.ServiceFee,
-                visit.MedicationCost,
-                visit.ServiceFee + visit.MedicationCost,
+                showAmounts ? visit.ServiceFee : null,
+                showAmounts ? visit.MedicationCost : null,
+                showAmounts ? visit.ServiceFee + visit.MedicationCost : null,
                 visit.Notes,
                 visit.Events.Count(),
                 visit.Events.Select(item => item.AnimalId).Distinct().Count()))
@@ -141,13 +144,14 @@ public sealed class AnimalHealthService(TecNMDbContext db)
             ?? throw ApiException.NotFound("La visita no existe.");
         var events = await LoadEventsAsync(EventsQuery().Where(item => item.VetVisitId == id), cancellationToken);
 
+        var showAmounts = currentUser.Has(Permissions.PaymentsView);
         return new VetVisitDetail(
             visit.Id,
             visit.VisitDate,
             visit.VetName,
-            visit.ServiceFee,
-            visit.MedicationCost,
-            visit.ServiceFee + visit.MedicationCost,
+            showAmounts ? visit.ServiceFee : null,
+            showAmounts ? visit.MedicationCost : null,
+            showAmounts ? visit.ServiceFee + visit.MedicationCost : null,
             visit.Notes,
             events.Count,
             events.Select(item => item.AnimalId).Distinct().Count(),
@@ -179,7 +183,7 @@ public sealed class AnimalHealthService(TecNMDbContext db)
         return await GetVisitAsync(visit.Id, cancellationToken);
     }
 
-    private static void ApplyVisit(VetVisit visit, VetVisitInput input)
+    private void ApplyVisit(VetVisit visit, VetVisitInput input)
     {
         var date = input.VisitDate ?? throw ApiException.BadRequest("Indica la fecha de la visita.");
         var vetName = TextInput.Clean(input.VetName) ?? throw ApiException.BadRequest("Escribe el nombre del veterinario.");
@@ -199,8 +203,10 @@ public sealed class AnimalHealthService(TecNMDbContext db)
             throw ApiException.Unprocessable("La fecha de la visita no puede ser futura.");
         }
 
-        var serviceFee = input.ServiceFee ?? 0;
-        var medicationCost = input.MedicationCost ?? 0;
+        // Sin payments.view los importes enviados se ignoran: una visita nueva queda en 0 y una existente conserva los suyos.
+        var canSetAmounts = currentUser.Has(Permissions.PaymentsView);
+        var serviceFee = canSetAmounts ? input.ServiceFee ?? 0 : visit.ServiceFee;
+        var medicationCost = canSetAmounts ? input.MedicationCost ?? 0 : visit.MedicationCost;
         foreach (var amount in new[] { serviceFee, medicationCost })
         {
             if (amount < 0 || amount > MaxAmount || !TextInput.HasTwoDecimalsAtMost(amount))

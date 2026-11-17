@@ -1,10 +1,11 @@
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using TecNM.Api.Core.Entities;
+using TecNM.Api.Core.Security;
 
 namespace TecNM.Api.Data;
 
-public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> options) : DbContext(options)
+public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> options, ICurrentUser currentUser) : DbContext(options)
 {
     public DbSet<Species> Species => Set<Species>();
     public DbSet<Breed> Breeds => Set<Breed>();
@@ -40,6 +41,9 @@ public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> opti
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,16 +62,25 @@ public sealed partial class TecNMDbContext(DbContextOptions<TecNMDbContext> opti
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        // Auditoría: cuándo y quién creó, modificó o eliminó (borrado lógico) cada registro.
         var now = DateTime.UtcNow;
+        var userId = currentUser.Id;
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = now;
+                entry.Entity.CreatedBy = userId;
             }
             else if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = now;
+                entry.Entity.UpdatedBy = userId;
+                var deletedAt = entry.Property(entity => entity.DeletedAt);
+                if (deletedAt.IsModified && deletedAt.OriginalValue is null && deletedAt.CurrentValue is not null)
+                {
+                    entry.Entity.DeletedBy = userId;
+                }
             }
         }
 

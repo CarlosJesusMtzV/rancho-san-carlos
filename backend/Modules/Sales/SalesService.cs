@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using TecNM.Api.Core;
 using TecNM.Api.Core.Entities;
 using TecNM.Api.Core.Errors;
+using TecNM.Api.Core.Security;
 using TecNM.Api.Data;
 
 namespace TecNM.Api.Modules.Sales;
 
-public sealed partial class SalesService(TecNMDbContext db)
+public sealed partial class SalesService(TecNMDbContext db, ICurrentUser currentUser)
 {
     private const int DefaultRangeDays = 90;
     private const int DueSoonDays = 2;
@@ -76,7 +77,10 @@ public sealed partial class SalesService(TecNMDbContext db)
         var day = date ?? RanchClock.Today;
         var held = orderId is { } id ? await HeldByOrderAsync(id, cancellationToken) : [];
 
-        var stock = await db.CheeseStock.AsNoTracking().Where(item => item.ExpiresOn >= day).ToListAsync(cancellationToken);
+        // Cada quien ve solo lo que su rol le permite vender.
+        var canCheese = currentUser.Has(Permissions.SalesCheese);
+        var canLivestock = currentUser.Has(Permissions.SalesLivestock);
+        var stock = canCheese ? await db.CheeseStock.AsNoTracking().Where(item => item.ExpiresOn >= day).ToListAsync(cancellationToken) : [];
         var prices = await db.Products.AsNoTracking().ToDictionaryAsync(product => product.Id, product => product.UnitPrice, cancellationToken);
         var cheese = stock
             .Select(item => new { item, available = item.Available + held.GetValueOrDefault((item.Source, item.SourceId)) })
@@ -90,7 +94,7 @@ public sealed partial class SalesService(TecNMDbContext db)
             .ToDictionaryAsync(product => product.Sku, cancellationToken);
         var reservedAnimals = await ReservedAsync(item => item.AnimalId, orderId, cancellationToken);
         var animals = await db.Animals.AsNoTracking()
-            .Where(animal => animal.LifecycleStatus == AnimalLifecycle.Active && !reservedAnimals.Contains(animal.Id))
+            .Where(animal => canLivestock && animal.LifecycleStatus == AnimalLifecycle.Active && !reservedAnimals.Contains(animal.Id))
             .Select(animal => new
             {
                 animal.Id,
@@ -115,7 +119,7 @@ public sealed partial class SalesService(TecNMDbContext db)
         var reservedCarcasses = await ReservedAsync(item => item.KidSlaughterId, orderId, cancellationToken);
         var carcassProductId = products[SkuCarcass].Id;
         var carcasses = await db.KidSlaughters.AsNoTracking()
-            .Where(kid => !reservedCarcasses.Contains(kid.Id))
+            .Where(kid => canLivestock && !reservedCarcasses.Contains(kid.Id))
             .OrderBy(kid => kid.SlaughterRun.RunDate).ThenBy(kid => kid.Animal.VisualTag)
             .Select(kid => new AvailableCarcass(kid.Id, kid.Animal.VisualTag, carcassProductId, kid.CarcassWeightKg, kid.SlaughterRun.RunDate))
             .ToListAsync(cancellationToken);
@@ -224,6 +228,7 @@ public sealed partial class SalesService(TecNMDbContext db)
             throw ApiException.Unprocessable("La fecha del pedido no puede ser futura.");
         }
 
+        EnsureCanSell(order.Items);
         order.OrderDate = date;
         await ApplyHeaderAsync(order, request, cancellationToken);
         var lines = await ValidateLinesAsync(request.Items, date, order.Id, cancellationToken);
@@ -253,6 +258,7 @@ public sealed partial class SalesService(TecNMDbContext db)
             throw ApiException.Conflict(order.OrderStatus == Order.Delivered ? "El pedido ya se entregó." : "Un pedido cancelado no se entrega.");
         }
 
+        EnsureCanSell(order.Items);
         var method = ValidatePaymentMethod(request.PaymentMethod);
         var deliveredOn = request.DeliveredOn ?? RanchClock.Today;
         if (deliveredOn > RanchClock.Today || deliveredOn < order.OrderDate)
@@ -279,6 +285,12 @@ public sealed partial class SalesService(TecNMDbContext db)
         if (order.OrderStatus == Order.Cancelled)
         {
             throw ApiException.Conflict("El pedido ya está cancelado.");
+        }
+
+        EnsureCanSell(order.Items);
+        if (order.OrderStatus == Order.Delivered && !currentUser.Has(Permissions.SalesCancel))
+        {
+            throw ApiException.Forbidden("Solo un administrador cancela una venta ya entregada.");
         }
 
         if (await db.Invoices.AnyAsync(invoice => invoice.OrderId == id, cancellationToken))
@@ -501,6 +513,7 @@ public sealed partial class SalesService(TecNMDbContext db)
                 throw ApiException.BadRequest("Un producto aparece dos veces en el pedido; junta las cantidades en un renglón.");
             }
 
+            EnsureCanSell(kind);
             switch (kind)
             {
                 case KindCheese:
@@ -610,6 +623,28 @@ public sealed partial class SalesService(TecNMDbContext db)
         }
 
         return result;
+    }
+
+    /// <summary>El queso lo vende quesería (sales.cheese); el ganado en pie y la canal, ganadería (sales.livestock).</summary>
+    private void EnsureCanSell(string? kind)
+    {
+        if (kind == KindCheese && !currentUser.Has(Permissions.SalesCheese))
+        {
+            throw ApiException.Forbidden("Tu rol no vende queso; lo vende el área de quesería.");
+        }
+
+        if (kind is KindAnimal or KindCarcass && !currentUser.Has(Permissions.SalesLivestock))
+        {
+            throw ApiException.Forbidden("Tu rol no vende ganado ni canales; los vende el área de ganadería.");
+        }
+    }
+
+    private void EnsureCanSell(IEnumerable<OrderItem> items)
+    {
+        foreach (var item in items)
+        {
+            EnsureCanSell(item.CheeseBatchOutputId is not null || item.CheesePurchaseId is not null ? KindCheese : item.AnimalId is not null ? KindAnimal : KindCarcass);
+        }
     }
 
     private static decimal ValidatePrice(decimal? value, string what)

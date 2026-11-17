@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using TecNM.Api.Core;
 using TecNM.Api.Core.Entities;
 using TecNM.Api.Core.Errors;
+using TecNM.Api.Core.Security;
 using TecNM.Api.Data;
 
 namespace TecNM.Api.Modules.Slaughter;
 
-public sealed class SlaughterService(TecNMDbContext db)
+public sealed class SlaughterService(TecNMDbContext db, ICurrentUser currentUser)
 {
     private const int DefaultRangeDays = 180;
     private const decimal MaxWeightKg = 100m;
@@ -101,7 +102,7 @@ public sealed class SlaughterService(TecNMDbContext db)
         {
             RunDate = date,
             Slaughterhouse = header.Slaughterhouse,
-            Cost = header.Cost,
+            Cost = CanSeePayments ? header.Cost : null,
             Notes = header.Notes,
             Kids = kids.Select(kid => new KidSlaughter { AnimalId = kid.AnimalId, LiveWeightKg = kid.Live, CarcassWeightKg = kid.Carcass }).ToList(),
         };
@@ -163,7 +164,11 @@ public sealed class SlaughterService(TecNMDbContext db)
         }
 
         run.Slaughterhouse = header.Slaughterhouse;
-        run.Cost = header.Cost;
+        if (CanSeePayments)
+        {
+            run.Cost = header.Cost;
+        }
+
         run.Notes = header.Notes;
         await db.SaveChangesAsync(cancellationToken);
         return await GetRunAsync(run.Id, cancellationToken);
@@ -384,8 +389,12 @@ public sealed class SlaughterService(TecNMDbContext db)
         return ids.ToHashSet();
     }
 
-    private static SlaughterRunSummary ToSummary(SlaughterRun run)
+    /// <summary>El pago al rastro es un pago: sin payments.view no se muestra ni se cambia.</summary>
+    private bool CanSeePayments => currentUser.Has(Permissions.PaymentsView);
+
+    private SlaughterRunSummary ToSummary(SlaughterRun run)
     {
+        var cost = CanSeePayments ? run.Cost : null;
         var live = run.Kids.Sum(kid => kid.LiveWeightKg);
         var carcass = run.Kids.Sum(kid => kid.CarcassWeightKg);
         var count = run.Kids.Count;
@@ -393,12 +402,12 @@ public sealed class SlaughterService(TecNMDbContext db)
             run.Id,
             run.RunDate,
             run.Slaughterhouse,
-            run.Cost,
+            cost,
             count,
             live,
             carcass,
             live == 0 ? 0 : YieldPercent(carcass, live),
-            run.Cost is { } cost && count > 0 ? decimal.Round(cost / count, 2) : null,
+            cost is { } amount && count > 0 ? decimal.Round(amount / count, 2) : null,
             run.Notes);
     }
 

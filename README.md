@@ -68,7 +68,7 @@ El script guarda puertos y contraseña PostgreSQL en `.env`. `--project-name tec
 
 ## Base de datos de cada microservicio
 
-El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 56 tablas, 7 vistas, 10 triggers (sanitarios, de quesería, de matanza y de ventas) y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
+El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 49 tablas, 7 vistas, 10 triggers (sanitarios, de quesería, de matanza y de ventas) y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
 
 El backend incluye un DbContext todavía sin entidades; se mapean conforme se construye cada módulo.
 

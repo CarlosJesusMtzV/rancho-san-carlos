@@ -4,7 +4,7 @@
 
 Contrato del esquema PostgreSQL definido en [`database.sql`](../database.sql). Parte del diseño original `BDPRY.sql` (50 tablas, sintaxis de SQL Server exportada de un diagrama) y lo corrige para PostgreSQL 15 y las convenciones del template.
 
-- 56 tablas, 7 vistas y 10 triggers de reglas sanitarias, de quesería, de matanza y de ventas, todo en `snake_case` e inglés.
+- 49 tablas, 7 vistas y 10 triggers de reglas sanitarias, de quesería, de matanza y de ventas, todo en `snake_case` e inglés.
 - Solo ganado bovino y caprino; reglas de dominio en [`domain.spec.md`](domain.spec.md).
 - Se ejecuta al inicializar un volumen nuevo. No migra bases existentes.
 
@@ -79,13 +79,6 @@ Se conservan en todas las tablas, renombradas:
 | `DetallePedido` | `order_items` | Cantidad decimal; enlaza presentación de tanda, compra de reventa, animal vivo o canal. Ganado y canal por kilo (cantidad = kg). |
 | `Factura` | `invoices` | Opcional, una por pedido; folio fiscal único; valida total = subtotal + impuestos. Sin estado de pago. |
 | `Pago` | `payments` | Del pedido, no de la factura: se cobra completo al entregar; uno vigente por pedido. |
-| `Envio` | `shipments` | Agrega número de guía de tránsito. |
-| `TipoInstalacion` | `facility_types` |  |
-| `Instalacion` | `facilities` |  |
-| `CategoriaEquipo` | `equipment_categories` |  |
-| `Equipo` | `equipment` |  |
-| `Mantenimiento` | `maintenance_records` |  |
-| `Vehiculo` | `vehicles` |  |
 | `Proveedor` | `suppliers` |  |
 | `OrdenCompra` | `purchase_orders` | `total_orden` se calcula en `v_purchase_order_totals`. |
 | `DetalleOrdenCompra` | `purchase_order_items` |  |
@@ -145,6 +138,7 @@ Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasita
 | 5 | `2026-11-13-05-matanza.sql` | Jornadas de matanza (`slaughter_runs`), `kid_slaughters` ligada a la jornada con peso vivo obligatorio, un cabrito por matanza vigente; se detiene si ya hay matanzas |
 | 6 | `2026-11-13-06-ventas.sql` | Encargos y entrega en `orders`, ganado y canal por kilo, pago por pedido, factura sin estado de pago, `tg_order_items_check`, `tg_orders_check`, tipos de cliente; se detiene si ya hay ventas |
 | 7 | `2026-11-16-07-acceso.sql` | Cuentas sin columna `role`, tablas `roles` y `user_roles`, los 7 roles; se detiene si ya hay cuentas |
+| 8 | `2026-11-16-08-limpieza-tablas.sql` | Quita las 7 tablas de equipo, vehículos e instalaciones y la columna `facility_id` de `animal_lots` y `supply_stock`; se detiene si alguna tiene datos |
 
 Comprobado para cada script: aplicarlo sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` correspondiente (comparación con `pg_dump -s`).
 
@@ -162,7 +156,7 @@ Mapeadas: `species`, `breeds`, `animal_lots`, `animals`, `weight_records` y la v
 Verificado en PostgreSQL 16 local el 2026-11-10 (la imagen del proyecto usa PostgreSQL 15; falta repetirlo con Docker):
 
 1. El script completo corre en una transacción sin errores.
-2. 56 tablas, 7 vistas, 10 triggers, 0 identificadores con mayúsculas.
+2. 49 tablas, 7 vistas, 10 triggers, 0 identificadores con mayúsculas.
 3. Ordeña de cabra aceptada; ordeña de bovino, de macho o de cabra con retiro rechazada; aceptada al terminar el retiro.
 4. Matanza de bovino, de cabrito con retiro o con canal mayor que el peso vivo rechazada; aceptada tras el retiro.
 5. Raza o lote de otra especie y tercera especie rechazados.

@@ -72,7 +72,10 @@ docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-05-matanza.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-06-ventas.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-16-07-acceso.sql
+docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-16-08-limpieza-tablas.sql
 ```
+
+La migración 08 quita 7 tablas que no se usaban (equipo, vehículos e instalaciones) y se detiene si alguna tiene datos.
 
 Después de la migración 07 vuelve a correr `python scripts/setup-dev.py` con tu mismo `--project-name`: reconstruye la API, genera la contraseña temporal del dueño y la muestra al final.
 

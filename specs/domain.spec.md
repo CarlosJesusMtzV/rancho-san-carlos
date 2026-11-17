@@ -57,7 +57,7 @@ El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, s
 | 4 | Ordeña | `milk_lots`, `milk_records` | Caprino |
 | 5 | Quesería | `products`, `cheese_batches`, `cheese_batch_outputs`, `cheese_purchases`, `cheese_stock_adjustments` | Caprino; asadero de proveedor |
 | 6 | Matanza de cabritos | `slaughter_runs`, `kid_slaughters` | Caprino |
-| 7 | Ventas | `customers`, `orders`, `order_items`, `invoices`, `payments` (`shipments` queda para Equipo) | Ambas |
+| 7 | Ventas | `customers`, `orders`, `order_items`, `invoices`, `payments` | Ambas |
 | Después | Insumos, compras, RH, equipo, finanzas | Ver `specs/database.spec.md` | — |
 
 Cada módulo se construye como vertical slice con su propia spec en `backend/Modules/<Feature>/specs/` y `frontend/src/modules/<feature>/specs/`.
@@ -166,7 +166,7 @@ Pendientes:
 
 ## Aceptación
 
-1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 56 tablas, 7 vistas y 10 triggers en `snake_case`.
+1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 49 tablas, 7 vistas y 10 triggers en `snake_case`.
 2. Registrar ordeña de un bovino, de un macho o de una cabra con retiro de leche falla en la base de datos.
 3. Registrar la matanza de un bovino o de un cabrito con retiro de carne falla.
 4. Asignar a un animal una raza o lote de otra especie falla.

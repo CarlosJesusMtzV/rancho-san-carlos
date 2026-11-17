@@ -6,7 +6,6 @@ public sealed class AnimalLot : AuditableEntity
     public string Code { get; set; } = string.Empty;
     public string? Description { get; set; }
     public short SpeciesId { get; set; }
-    public int? FacilityId { get; set; }
 
     public Species Species { get; set; } = null!;
 }

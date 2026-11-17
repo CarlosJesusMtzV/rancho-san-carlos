@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiToast } from '../../../shared/components'
 import { formatDate, formatMoney, todayIso } from '../../../shared/utils/format'
 import { createRun, deleteRun, getRun, listKids, updateRun } from '../api/slaughterApi'
@@ -186,7 +187,7 @@ onMounted(load)
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'slaughter' }">Volver a matanza</RouterLink>
-        <UiButton v-if="run" variant="danger" @click="deleteOpen = true">Eliminar</UiButton>
+        <UiButton v-if="run && can('slaughter.delete')" variant="danger" @click="deleteOpen = true">Eliminar</UiButton>
       </div>
     </template>
 
@@ -200,7 +201,7 @@ onMounted(load)
         <div class="panel-form">
           <UiField v-model="form.runDate" label="Fecha *" type="date" :max="today" :disabled="!!run" required />
           <UiField v-model="form.slaughterhouse" label="Rastro o matancero *" maxlength="120" placeholder="Ej. Rastro Municipal de Castaños" />
-          <UiField v-model="form.cost" label="Pago total (MXN)" type="number" min="0" step="0.01" inputmode="decimal" />
+          <UiField v-if="can('payments.view')" v-model="form.cost" label="Pago total (MXN)" type="number" min="0" step="0.01" inputmode="decimal" />
           <UiField v-model="form.notes" label="Notas" maxlength="255" />
         </div>
       </UiCard>
@@ -248,7 +249,7 @@ onMounted(load)
       </UiCard>
 
       <div class="panel-actions">
-        <UiButton type="submit" :loading="saving">{{ run ? 'Guardar cambios' : 'Registrar matanza' }}</UiButton>
+        <UiButton v-if="can('slaughter.write')" type="submit" :loading="saving">{{ run ? 'Guardar cambios' : 'Registrar matanza' }}</UiButton>
         <RouterLink class="btn secondary" :to="{ name: 'slaughter' }">Cancelar</RouterLink>
       </div>
     </form>

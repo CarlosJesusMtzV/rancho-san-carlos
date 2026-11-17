@@ -30,7 +30,7 @@ Puertos distintos, entre 1 y 65535, publicados solo en `127.0.0.1`. Un conflicto
 3. Guarda `.env` y genera o reutiliza el certificado autofirmado en `.docker/certs/`.
 4. Construye imágenes y vuelve a comprobar puertos.
 5. Inicia PostgreSQL y espera su health check; después inicia backend y frontend.
-6. Muestra nombres y URLs de acceso.
+6. Muestra nombres y URLs de acceso, y el usuario y la contraseña temporal del dueño inicial (`TECNM_OWNER_USERNAME`, `TECNM_OWNER_PASSWORD` en `.env`). La API crea esa cuenta solo cuando no existe ninguna.
 
 El navegador puede pedir aceptar el certificado local. Producción requiere su configuración de certificados, red y credenciales.
 

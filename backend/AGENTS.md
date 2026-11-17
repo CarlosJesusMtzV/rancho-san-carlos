@@ -26,6 +26,7 @@
 - `database.sql` en raíz pertenece al microservicio; mantenerlo alineado con entidades y estrategia de migraciones.
 - Base de datos en `snake_case`; identificadores, archivos y rutas en inglés.
 - Textos dirigidos al usuario en español de México. No devolver excepciones crudas.
+- Todo endpoint exige sesión y lleva `[RequirePermission(...)]` con un permiso de `Core/Security/Permissions.cs`; los pagos y costos solo se muestran o cambian con `payments.view`. La matriz vive en `Modules/Access/specs/access.spec.md` y se actualiza junto con el código.
 
 ## Validación
 

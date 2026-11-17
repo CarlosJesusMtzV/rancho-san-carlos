@@ -70,5 +70,6 @@ export const sidebarNavigation: NavigationItem[] = [
       { label: 'Clientes', to: '/panel/ventas/clientes' },
     ],
   },
+  { label: 'Usuarios', to: '/panel/usuarios' },
   { label: 'Sitio público', to: '/' },
 ]

@@ -34,6 +34,7 @@
 - Escribir textos visibles al usuario en español de México (es-MX), sin mezclar idiomas en una misma cadena.
 - Usar rutas de importación compatibles con la configuración real de TypeScript y Vite; no asumir alias inexistentes.
 - Mantener credenciales y configuración sensible fuera de Git.
+- Cada zona nueva del panel se registra en `src/app/access.ts` con su permiso; los botones que el rol no puede usar se ocultan con `can('permiso')` (`src/shared/auth/session.ts`). Ocultar no sustituye la comprobación de la API.
 
 ## Validación
 

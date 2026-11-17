@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBadge, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiMetric, UiTable, UiToast, UiToggle } from '../../../shared/components'
 import { formatDate, todayIso } from '../../../shared/utils/format'
 import { createAdjustment, getSummary, listStock } from '../api/cheeseApi'
@@ -109,8 +110,8 @@ onMounted(async () => {
   <UiBasePage fluid title="Quesería" description="Canasta y panela de leche de cabra propia; asadero de proveedor para reventa.">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink class="btn" :to="{ name: 'cheese-batch-new' }">Registrar tanda</RouterLink>
-        <RouterLink class="btn secondary" :to="{ name: 'cheese-purchase-new' }">Comprar asadero</RouterLink>
+        <RouterLink v-if="can('cheese.produce')" class="btn" :to="{ name: 'cheese-batch-new' }">Registrar tanda</RouterLink>
+        <RouterLink v-if="can('cheese.purchases')" class="btn secondary" :to="{ name: 'cheese-purchase-new' }">Comprar asadero</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'cheese-history' }">Historial</RouterLink>
       </div>
     </template>
@@ -142,11 +143,12 @@ onMounted(async () => {
         </div>
         <p v-if="rows.length === 0" class="panel-muted">
           No hay queso en existencia.
-          <RouterLink class="panel-link" :to="{ name: 'cheese-batch-new' }">Registrar una tanda</RouterLink>
+          <RouterLink v-if="can('cheese.produce')" class="panel-link" :to="{ name: 'cheese-batch-new' }">Registrar una tanda</RouterLink>
         </p>
         <UiTable v-else label="Existencias de queso" :columns="columns" :rows="rows">
           <template #cell-code="{ row }">
-            <RouterLink class="panel-link" :to="detailRoute(row)">{{ row.code }}</RouterLink>
+            <RouterLink v-if="row.source === 'batch' || can('cheese.purchases')" class="panel-link" :to="detailRoute(row)">{{ row.code }}</RouterLink>
+            <template v-else>{{ row.code }}</template>
           </template>
           <template #cell-productName="{ row }">
             {{ row.productName }}
@@ -163,7 +165,7 @@ onMounted(async () => {
           </template>
           <template #cell-id="{ row }">
             <button
-              v-if="row.available > 0"
+              v-if="row.available > 0 && can('cheese.produce')"
               type="button"
               class="panel-icon-button panel-icon-button--neutral"
               :aria-label="`Registrar merma de ${row.productName} ${row.code}`"
@@ -171,7 +173,7 @@ onMounted(async () => {
             >
               Merma
             </button>
-            <span v-else class="panel-muted">Agotado</span>
+            <span v-else class="panel-muted">{{ row.available > 0 ? '—' : 'Agotado' }}</span>
           </template>
         </UiTable>
       </UiCard>

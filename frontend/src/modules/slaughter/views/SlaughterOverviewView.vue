@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiBasePage, UiCard, UiLoadError, UiMetric, UiTable, UiToast } from '../../../shared/components'
 import { formatDate, formatMoney } from '../../../shared/utils/format'
 import { getSummary, listCarcasses, listRuns } from '../api/slaughterApi'
@@ -32,7 +33,8 @@ const runColumns = [
   { key: 'kidCount' as const, label: 'Cabritos' },
   { key: 'carcassWeightKg' as const, label: 'Canal' },
   { key: 'yieldPercent' as const, label: 'Rendimiento' },
-  { key: 'cost' as const, label: 'Pago' },
+  // El pago al rastro solo lo ven los administradores.
+  ...(can('payments.view') ? [{ key: 'cost' as const, label: 'Pago' }] : []),
 ]
 
 async function load(): Promise<void> {
@@ -57,7 +59,7 @@ onMounted(async () => {
   <UiBasePage fluid title="Matanza de cabritos" description="Jornadas en rastro o con matancero externo. La canal se vende entera.">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink class="btn" :to="{ name: 'slaughter-new' }">Registrar matanza</RouterLink>
+        <RouterLink v-if="can('slaughter.write')" class="btn" :to="{ name: 'slaughter-new' }">Registrar matanza</RouterLink>
       </div>
     </template>
 
@@ -83,7 +85,7 @@ onMounted(async () => {
       <UiCard title="Canales sin vender" description="De la más antigua a la más reciente.">
         <p v-if="carcasses.length === 0" class="panel-muted">No hay canales disponibles.</p>
         <UiTable v-else label="Canales sin vender" :columns="carcassColumns" :rows="carcasses.map((item) => ({ ...item, id: item.slaughterId }))">
-          <template #cell-visualTag="{ row }"><RouterLink class="panel-link" :to="`/panel/hato/${row.animalId}`">{{ row.visualTag }}</RouterLink></template>
+          <template #cell-visualTag="{ row }"><RouterLink v-if="can('herd.read')" class="panel-link" :to="`/panel/hato/${row.animalId}`">{{ row.visualTag }}</RouterLink><template v-else>{{ row.visualTag }}</template></template>
           <template #cell-carcassWeightKg="{ row }"><strong>{{ kg(row.carcassWeightKg) }}</strong></template>
           <template #cell-runDate="{ row }">
             <RouterLink class="panel-link" :to="{ name: 'slaughter-run', params: { id: row.runId } }">{{ formatDate(row.runDate) }}</RouterLink>

@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
+import { computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 
-import { UiBadge, UiBasePage, UiCallout, UiCard, UiLayout } from '../../../shared/components'
+import { canVisit } from '../../../app/access'
+import { session } from '../../../shared/auth/session'
+import { UiAlert, UiBadge, UiBasePage, UiCallout, UiCard, UiLayout } from '../../../shared/components'
+
+const route = useRoute()
 
 // Módulos del sistema. Cada uno se construye como vertical slice con su spec; `to` marca los disponibles.
 const modules: { name: string; scope: string; species: string; to?: string }[] = [
@@ -13,19 +18,26 @@ const modules: { name: string; scope: string; species: string; to?: string }[] =
   { name: 'Matanza de cabritos', scope: 'Jornadas en rastro o con matancero: peso vivo, canal y rendimiento, solo tras el retiro sanitario.', species: 'Solo caprino', to: '/panel/matanza' },
   { name: 'Ventas', scope: 'Ventas y encargos de queso, ganado en pie y canal por kilo; cobro al entregar y factura opcional.', species: 'Bovino y caprino', to: '/panel/ventas' },
 ]
+
+// Cada quien ve los módulos de su rol.
+const visibleModules = computed(() => modules.filter((module) => !module.to || canVisit(module.to)))
+const roleNames = computed(() => session.value?.roles.map((role) => role.name).join(', ') ?? '')
 </script>
 
 <template>
-  <UiBasePage fluid title="Panel" description="Sistema de gestión de Rancho San Carlos y La Cremería San Carlos">
+  <UiBasePage fluid title="Panel" :description="session ? `${session.fullName} · ${roleNames}` : 'Sistema de gestión de Rancho San Carlos y La Cremería San Carlos'">
     <UiLayout kind="stack">
+      <UiAlert v-if="route.query['sin-permiso']" tone="warning" title="Tu rol no incluye esa sección">
+        Estos son los módulos que puedes usar. Si necesitas otro, pídeselo al dueño.
+      </UiAlert>
       <UiCallout title="Reglas del negocio">
         Las vacas se crían únicamente para carne y se venden vivas, como becerros de unos 8 meses y 150 kg. Las chivas
         dan cabritos, que se venden en pie o en canal, y la leche con la que se elaboran el canasta y el panela. Solo se
         ordeñan cabras. El asadero se compra hecho (leche de vaca) y solo se revende.
       </UiCallout>
-      <UiCard title="Módulos" description="Se construyen en este orden. Los disponibles llevan enlace.">
+      <UiCard title="Tus módulos" description="Lo que tu rol te permite usar.">
         <ul class="module-list">
-          <li v-for="module in modules" :key="module.name">
+          <li v-for="module in visibleModules" :key="module.name">
             <div>
               <RouterLink v-if="module.to" class="module-link" :to="module.to">{{ module.name }}</RouterLink>
               <strong v-else>{{ module.name }}</strong>
@@ -33,10 +45,10 @@ const modules: { name: string; scope: string; species: string; to?: string }[] =
             </div>
             <div class="module-tags">
               <UiBadge :tone="module.species === 'Solo caprino' ? 'success' : 'info'">{{ module.species }}</UiBadge>
-              <UiBadge :tone="module.to ? 'success' : 'warning'">{{ module.to ? 'Disponible' : 'Pendiente' }}</UiBadge>
             </div>
           </li>
         </ul>
+        <p v-if="visibleModules.length === 0" class="panel-muted">Tu cuenta aún no tiene módulos asignados.</p>
       </UiCard>
     </UiLayout>
   </UiBasePage>

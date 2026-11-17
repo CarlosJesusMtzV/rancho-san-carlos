@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiBadge, UiBasePage, UiCard, UiChip, UiLoadError, UiMetric, UiTable, UiToast } from '../../../shared/components'
 import { formatDate, formatMoney, todayIso } from '../../../shared/utils/format'
 import { getSummary, listOrders } from '../api/salesApi'
@@ -32,7 +33,8 @@ const columns = [
 async function load(): Promise<void> {
   error.value = ''
   try {
-    ;[summary.value, orders.value] = await Promise.all([getSummary(), listOrders()])
+    // El resumen en dinero es administrativo.
+    ;[summary.value, orders.value] = await Promise.all([can('payments.view') ? getSummary() : null, listOrders()])
   } catch (cause) {
     error.value = getApiErrorMessage(cause)
   }
@@ -57,10 +59,10 @@ onMounted(async () => {
     </template>
 
     <UiLoadError v-if="error" :message="error" @retry="load" />
-    <p v-else-if="!summary || !orders" aria-busy="true">Cargando…</p>
+    <p v-else-if="!orders" aria-busy="true">Cargando…</p>
 
     <div v-else class="stack">
-      <div class="panel-metrics">
+      <div v-if="summary" class="panel-metrics">
         <UiCard metric><UiMetric label="Vendido en el mes" :value="formatMoney(summary.monthTotal)" description="Entregado y cobrado" /></UiCard>
         <UiCard metric><UiMetric label="Queso" :value="formatMoney(summary.monthByKind.cheese)" description="En el mes" /></UiCard>
         <UiCard metric><UiMetric label="Ganado y canal" :value="formatMoney(summary.monthByKind.animal + summary.monthByKind.carcass)" :description="`En pie ${formatMoney(summary.monthByKind.animal)} · canal ${formatMoney(summary.monthByKind.carcass)}`" /></UiCard>

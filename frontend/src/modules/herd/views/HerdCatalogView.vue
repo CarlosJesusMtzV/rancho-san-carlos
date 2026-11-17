@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { createBreed, createLot } from '../api/herdApi'
 import SpeciesTag from '../components/SpeciesTag.vue'
@@ -106,7 +107,7 @@ onMounted(load)
 
     <div v-else class="grid">
       <UiCard title="Razas">
-        <form class="panel-form" novalidate @submit.prevent="saveBreed">
+        <form v-if="can('herd.write')" class="panel-form" novalidate @submit.prevent="saveBreed">
           <UiField v-model="breedForm.speciesId" as="select" label="Especie *" :options="speciesOptions" />
           <UiField v-model="breedForm.name" label="Nombre *" maxlength="80" placeholder="Ej. Charolais, Alpina" required />
           <UiField v-model="breedForm.purpose" label="Propósito" maxlength="120" placeholder="Ej. Carne, leche" />
@@ -121,7 +122,7 @@ onMounted(load)
       </UiCard>
 
       <UiCard title="Lotes">
-        <form class="panel-form" novalidate @submit.prevent="saveLot">
+        <form v-if="can('herd.write')" class="panel-form" novalidate @submit.prevent="saveLot">
           <UiField v-model="lotForm.speciesId" as="select" label="Especie *" :options="speciesOptions" />
           <UiField v-model="lotForm.code" label="Código *" maxlength="30" placeholder="Ej. BOV-DESTETE" hint="Se guarda en mayúsculas." required />
           <UiField v-model="lotForm.description" label="Descripción" maxlength="255" />

@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiToast } from '../../../shared/components'
 import { formatDate } from '../../../shared/utils/format'
 import { deleteDay, getDay, listGoats, updateDay } from '../api/milkingApi'
@@ -92,7 +93,7 @@ onMounted(load)
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'milking' }">Volver a ordeña</RouterLink>
-        <UiButton v-if="day" variant="danger" @click="deleteOpen = true">Eliminar</UiButton>
+        <UiButton v-if="day && can('milking.delete')" variant="danger" @click="deleteOpen = true">Eliminar</UiButton>
       </div>
     </template>
 
@@ -101,10 +102,12 @@ onMounted(load)
 
     <div v-else class="stack">
       <UiAlert v-if="day.cheeseBatch" tone="info" title="Leche usada en quesería">
-        La tanda <RouterLink class="panel-link" :to="{ name: 'cheese-batch', params: { id: day.cheeseBatch.id } }">{{ day.cheeseBatch.code }}</RouterLink>
+        La tanda
+        <RouterLink v-if="can('cheese.read')" class="panel-link" :to="{ name: 'cheese-batch', params: { id: day.cheeseBatch.id } }">{{ day.cheeseBatch.code }}</RouterLink>
+        <strong v-else>{{ day.cheeseBatch.code }}</strong>
         usó {{ day.cheeseBatch.litersUsed }} L de esta ordeña: el total no puede ser menor y la ordeña no se elimina mientras exista la tanda.
       </UiAlert>
-      <p v-else><RouterLink class="panel-link" :to="{ name: 'cheese-batch-new', query: { ordena: day.id } }">Hacer tanda de queso con esta leche</RouterLink></p>
+      <p v-else-if="can('cheese.produce')"><RouterLink class="panel-link" :to="{ name: 'cheese-batch-new', query: { ordena: day.id } }">Hacer tanda de queso con esta leche</RouterLink></p>
 
       <UiCard title="Datos de la ordeña" description="La fecha no cambia; si fue otro día, elimínala y regístrala de nuevo.">
         <form class="stack" novalidate @submit.prevent="save">
@@ -114,7 +117,7 @@ onMounted(load)
           </div>
           <GoatChecklist v-model="form.goatIds" :goats="goats" :date="day.collectionDate" />
           <UiAlert v-if="saveError" tone="danger" title="No se guardó">{{ saveError }}</UiAlert>
-          <div class="panel-actions"><UiButton type="submit" :loading="saving">Guardar cambios</UiButton></div>
+          <div v-if="can('milking.write')" class="panel-actions"><UiButton type="submit" :loading="saving">Guardar cambios</UiButton></div>
         </form>
       </UiCard>
     </div>

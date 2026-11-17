@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiToast } from '../../../shared/components'
 import { formatDate } from '../../../shared/utils/format'
 import { getHerdCatalog, listAnimals, type AnimalSummary, type LotItem } from '../../herd'
@@ -125,7 +126,7 @@ onMounted(async () => {
   <UiBasePage fluid title="Historial sanitario" :description="animalTag ? `Eventos de ${animalTag}.` : 'Todos los eventos, del más reciente al más antiguo.'">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink class="btn" :to="{ name: 'health-event-new', query: filters.animalId ? { animal: filters.animalId } : {} }">Registrar evento</RouterLink>
+        <RouterLink v-if="can('health.write')" class="btn" :to="{ name: 'health-event-new', query: filters.animalId ? { animal: filters.animalId } : {} }">Registrar evento</RouterLink>
         <RouterLink v-if="filters.animalId" class="btn secondary" :to="`/panel/hato/${filters.animalId}`">Ficha del animal</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'health' }">Volver a sanidad</RouterLink>
       </div>
@@ -145,7 +146,7 @@ onMounted(async () => {
       <p v-else-if="loading && !page" aria-busy="true">Cargando…</p>
       <p v-else-if="page && page.items.length === 0" class="panel-muted">No hay eventos con estos filtros.</p>
       <template v-else-if="page">
-        <HealthEventsTable label="Historial sanitario" :events="page.items" deletable :busy-id="deleting ? pendingDelete?.id ?? null : null" @remove="askDelete" />
+        <HealthEventsTable label="Historial sanitario" :events="page.items" :deletable="can('health.delete')" :busy-id="deleting ? pendingDelete?.id ?? null : null" @remove="askDelete" />
         <nav v-if="totalPages > 1" class="panel-pager" aria-label="Páginas">
           <UiButton variant="secondary" :disabled="(filters.page ?? 1) <= 1" @click="setFilters({ pagina: String((filters.page ?? 1) - 1) })">Anterior</UiButton>
           <span>Página {{ filters.page }} de {{ totalPages }}</span>

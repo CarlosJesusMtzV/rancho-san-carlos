@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { createMedication, getHealthCatalog, updateMedication } from '../api/healthApi'
 import type { HealthCatalog, MedicationItem } from '../types/health'
@@ -103,7 +104,7 @@ onMounted(load)
     <p v-else-if="!catalog" aria-busy="true">Cargando…</p>
 
     <div v-else class="stack">
-      <UiCard id="medication-form" :title="editingId ? 'Editar medicamento' : 'Nuevo medicamento'" description="Los días de retiro se proponen al aplicarlo y se pueden cambiar en cada evento.">
+      <UiCard v-if="can('health.write')" id="medication-form" :title="editingId ? 'Editar medicamento' : 'Nuevo medicamento'" description="Los días de retiro se proponen al aplicarlo y se pueden cambiar en cada evento.">
         <form class="panel-form" novalidate @submit.prevent="save">
           <UiField v-model="form.supplyTypeId" as="select" label="Tipo *" :options="typeOptions" />
           <UiField v-model="form.commercialName" label="Nombre comercial *" maxlength="120" required />
@@ -125,7 +126,7 @@ onMounted(load)
           <template #cell-defaultMilkWithdrawalDays="{ row }">{{ row.defaultMilkWithdrawalDays }} días</template>
           <template #cell-defaultMeatWithdrawalDays="{ row }">{{ row.defaultMeatWithdrawalDays }} días</template>
           <template #cell-id="{ row }">
-            <button type="button" class="panel-icon-button panel-icon-button--neutral" :aria-label="`Editar ${row.commercialName}`" @click="edit(row)">Editar</button>
+            <button v-if="can('health.write')" type="button" class="panel-icon-button panel-icon-button--neutral" :aria-label="`Editar ${row.commercialName}`" @click="edit(row)">Editar</button>
           </template>
         </UiTable>
       </UiCard>

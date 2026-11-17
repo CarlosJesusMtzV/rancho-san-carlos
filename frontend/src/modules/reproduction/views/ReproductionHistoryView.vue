@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiBadge, UiBasePage, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { formatDate } from '../../../shared/utils/format'
 import { listAnimals, type AnimalSummary } from '../../herd'
@@ -149,7 +150,7 @@ onMounted(async () => {
             <template #cell-expectedDueDate="{ row }">{{ formatDate(row.expectedDueDate) }}</template>
             <template #cell-id="{ row }">
               <button
-                v-if="row.outcome === 'pending' && row.checks.length === 0"
+                v-if="can('repro.delete') && row.outcome === 'pending' && row.checks.length === 0"
                 type="button"
                 class="panel-icon-button"
                 :disabled="deletingId !== null"

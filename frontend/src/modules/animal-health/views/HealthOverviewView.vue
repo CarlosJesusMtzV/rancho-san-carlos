@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiBadge, UiBasePage, UiCard, UiLoadError, UiMetric, UiTable } from '../../../shared/components'
 import { formatDate, formatMoney } from '../../../shared/utils/format'
 import { SpeciesTag } from '../../herd'
@@ -28,7 +29,8 @@ const visitColumns = [
   { key: 'visitDate' as const, label: 'Fecha' },
   { key: 'vetName' as const, label: 'Veterinario' },
   { key: 'animalCount' as const, label: 'Animales' },
-  { key: 'total' as const, label: 'Pagado' },
+  // Los pagos solo los ven los administradores.
+  ...(can('payments.view') ? [{ key: 'total' as const, label: 'Pagado' }] : []),
 ]
 
 async function load(): Promise<void> {
@@ -47,7 +49,7 @@ onMounted(load)
   <UiBasePage fluid title="Sanidad" description="Retiros sanitarios vigentes y visitas del veterinario.">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink class="btn" :to="{ name: 'health-event-new' }">Registrar evento</RouterLink>
+        <RouterLink v-if="can('health.write')" class="btn" :to="{ name: 'health-event-new' }">Registrar evento</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'health-visits' }">Visitas</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'health-history' }">Historial</RouterLink>
       </div>

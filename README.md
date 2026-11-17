@@ -18,6 +18,7 @@ Sistema de gestión ganadera y quesera del negocio familiar en Castaños, Coahui
 | `/api/cheese/...` | API del módulo Quesería ([spec](backend/Modules/Cheese/specs/cheese.spec.md)) |
 | `/api/slaughter/...` | API del módulo Matanza de cabritos ([spec](backend/Modules/Slaughter/specs/slaughter.spec.md)) |
 | `/api/sales/...` | API del módulo Ventas ([spec](backend/Modules/Sales/specs/sales.spec.md)) |
+| `/api/auth/...`, `/api/users/...` | Inicio de sesión, roles y usuarios ([spec](backend/Modules/Access/specs/access.spec.md)) |
 
 Estado: esquema de base de datos, identidad visual, sitio público y módulos Hato (animales, razas, lotes, pesajes y becerros para venta) Sanidad (visitas del veterinario, eventos, retiros, medicamentos y laboratorio) Reproducción (montas, diagnóstico de preñez, partos y crías) Ordeña (ordeña diaria, cabras ordeñadas y lote de leche del día) Quesería (tandas de canasta y panela, compras de asadero, mermas y existencias) Matanza de cabritos (jornadas en rastro, pesos, rendimiento y canales sin vender) y Ventas (clientes, ventas y encargos, cobro al entregar y factura opcional). Siguiente: trazabilidad pública con datos reales. Seguimiento en [odd/tasks/](odd/tasks/).
 
@@ -67,7 +68,7 @@ El script guarda puertos y contraseña PostgreSQL en `.env`. `--project-name tec
 
 ## Base de datos de cada microservicio
 
-El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 54 tablas, 7 vistas, 10 triggers (sanitarios, de quesería, de matanza y de ventas) y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
+El setup carga PostgreSQL desde **[`database.sql`](database.sql) en la raíz**, mediante el inicializador de la imagen PostgreSQL. En este proyecto el archivo crea las 56 tablas, 7 vistas, 10 triggers (sanitarios, de quesería, de matanza y de ventas) y catálogos iniciales del rancho ([spec](specs/database.spec.md)).
 
 El backend incluye un DbContext todavía sin entidades; se mapean conforme se construye cada módulo.
 

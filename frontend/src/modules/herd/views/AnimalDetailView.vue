@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { addWeight, deleteWeight, getAnimal, registerExit } from '../api/herdApi'
 import LifecycleBadge from '../components/LifecycleBadge.vue'
@@ -131,11 +132,11 @@ onMounted(async () => {
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'herd' }">Volver al hato</RouterLink>
-        <RouterLink v-if="animal" class="btn secondary" :to="{ name: 'herd-edit', params: { id: animal.id } }">Editar</RouterLink>
+        <RouterLink v-if="animal && can('herd.write')" class="btn secondary" :to="{ name: 'herd-edit', params: { id: animal.id } }">Editar</RouterLink>
         <RouterLink v-if="animal" class="btn secondary" :to="{ path: '/panel/sanidad/historial', query: { animal: animal.id } }">Historial sanitario</RouterLink>
-        <RouterLink v-if="animal && isActive" class="btn secondary" :to="{ path: '/panel/sanidad/eventos/nuevo', query: { animal: animal.id } }">Evento sanitario</RouterLink>
-        <RouterLink v-if="animal?.sex === 'F'" class="btn secondary" :to="{ path: '/panel/reproduccion/historial', query: { hembra: animal.id } }">Reproducción</RouterLink>
-        <UiButton v-if="animal && isActive" variant="danger" @click="exitOpen = true">Dar de baja</UiButton>
+        <RouterLink v-if="animal && isActive && can('health.write')" class="btn secondary" :to="{ path: '/panel/sanidad/eventos/nuevo', query: { animal: animal.id } }">Evento sanitario</RouterLink>
+        <RouterLink v-if="animal?.sex === 'F' && can('repro.read')" class="btn secondary" :to="{ path: '/panel/reproduccion/historial', query: { hembra: animal.id } }">Reproducción</RouterLink>
+        <UiButton v-if="animal && isActive && can('herd.write')" variant="danger" @click="exitOpen = true">Dar de baja</UiButton>
       </div>
     </template>
 
@@ -185,7 +186,7 @@ onMounted(async () => {
       </UiCard>
 
       <UiCard title="Pesajes" :description="`${animal.weights.length} registro${animal.weights.length === 1 ? '' : 's'}`">
-        <form v-if="isActive" class="panel-filters" novalidate @submit.prevent="saveWeight">
+        <form v-if="isActive && can('herd.write')" class="panel-filters" novalidate @submit.prevent="saveWeight">
           <UiField v-model="weightForm.weighedOn" label="Fecha *" type="date" :max="today" :min="animal.birthDate ?? undefined" required />
           <UiField v-model="weightForm.weightKg" label="Peso (kg) *" type="number" min="0.1" max="1500" step="0.01" inputmode="decimal" required />
           <UiField v-model="weightForm.notes" label="Notas" maxlength="255" />
@@ -199,6 +200,7 @@ onMounted(async () => {
           <template #cell-notes="{ row }">{{ row.notes ?? '—' }}</template>
           <template #cell-id="{ row }">
             <button
+              v-if="can('herd.delete')"
               type="button"
               class="panel-icon-button"
               :disabled="deletingWeightId !== null"

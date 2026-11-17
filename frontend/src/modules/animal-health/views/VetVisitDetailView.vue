@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiToast } from '../../../shared/components'
 import { formatDate, formatMoney, todayIso } from '../../../shared/utils/format'
 import { getVisit, updateVisit } from '../api/healthApi'
@@ -27,8 +28,8 @@ function fill(detail: VetVisitDetail): void {
   Object.assign(form, {
     visitDate: detail.visitDate,
     vetName: detail.vetName,
-    serviceFee: String(detail.serviceFee),
-    medicationCost: String(detail.medicationCost),
+    serviceFee: String(detail.serviceFee ?? ''),
+    medicationCost: String(detail.medicationCost ?? ''),
     notes: detail.notes ?? '',
   })
 }
@@ -81,7 +82,7 @@ onMounted(async () => {
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'health-visits' }">Volver a visitas</RouterLink>
-        <RouterLink v-if="visit" class="btn" :to="{ name: 'health-event-new', query: { visita: visit.id } }">Registrar evento en esta visita</RouterLink>
+        <RouterLink v-if="visit && can('health.write')" class="btn" :to="{ name: 'health-event-new', query: { visita: visit.id } }">Registrar evento en esta visita</RouterLink>
       </div>
     </template>
 
@@ -89,7 +90,7 @@ onMounted(async () => {
     <p v-else-if="!visit" aria-busy="true">Cargando…</p>
 
     <div v-else class="stack">
-      <UiCard title="Datos y pago">
+      <UiCard :title="can('payments.view') ? 'Datos y pago' : 'Datos de la visita'">
         <form class="panel-form" novalidate @submit.prevent="save">
           <UiField
             v-model="form.visitDate"
@@ -100,12 +101,14 @@ onMounted(async () => {
             :hint="visit.eventCount > 0 ? 'No se cambia porque ya tiene eventos.' : undefined"
           />
           <UiField v-model="form.vetName" label="Veterinario *" maxlength="120" required />
-          <UiField v-model="form.serviceFee" label="Honorarios ($)" type="number" min="0" step="0.01" inputmode="decimal" />
-          <UiField v-model="form.medicationCost" label="Medicamentos ($)" type="number" min="0" step="0.01" inputmode="decimal" />
+          <template v-if="can('payments.view')">
+            <UiField v-model="form.serviceFee" label="Honorarios ($)" type="number" min="0" step="0.01" inputmode="decimal" />
+            <UiField v-model="form.medicationCost" label="Medicamentos ($)" type="number" min="0" step="0.01" inputmode="decimal" />
+          </template>
           <div class="panel-span"><UiField v-model="form.notes" label="Notas" maxlength="255" /></div>
           <div class="panel-span panel-actions">
-            <UiButton type="submit" variant="secondary" :loading="saving">Guardar cambios</UiButton>
-            <span class="panel-muted">Total: <strong>{{ formatMoney(formTotal) }}</strong></span>
+            <UiButton v-if="can('health.write')" type="submit" variant="secondary" :loading="saving">Guardar cambios</UiButton>
+            <span v-if="can('payments.view')" class="panel-muted">Total: <strong>{{ formatMoney(formTotal) }}</strong></span>
           </div>
         </form>
         <UiAlert v-if="saveError" tone="danger" title="No se guardó">{{ saveError }}</UiAlert>

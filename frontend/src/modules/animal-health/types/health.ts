@@ -57,9 +57,10 @@ export interface VetVisitSummary {
   id: number
   visitDate: string
   vetName: string
-  serviceFee: number
-  medicationCost: number
-  total: number
+  /** Importes: null si el usuario no tiene payments.view. */
+  serviceFee: number | null
+  medicationCost: number | null
+  total: number | null
   notes: string | null
   eventCount: number
   animalCount: number

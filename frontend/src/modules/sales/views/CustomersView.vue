@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import CustomerDialog from '../components/CustomerDialog.vue'
 import { getCatalog, listCustomers } from '../api/salesApi'
@@ -65,7 +66,7 @@ onMounted(async () => {
   <UiBasePage fluid title="Clientes" description="Restaurantes, tiendas, compradores de ganado y particulares.">
     <template #actions>
       <div class="panel-toolbar">
-        <UiButton @click="open(null)">Nuevo cliente</UiButton>
+        <UiButton v-if="can('sales.customers')" @click="open(null)">Nuevo cliente</UiButton>
         <RouterLink class="btn secondary" :to="{ name: 'sales' }">Volver a ventas</RouterLink>
       </div>
     </template>
@@ -83,7 +84,7 @@ onMounted(async () => {
         <template #cell-address="{ row }">{{ row.address ?? '—' }}</template>
         <template #cell-id="{ row }">
           <div class="cu-actions">
-            <button type="button" class="panel-icon-button panel-icon-button--neutral" :aria-label="`Editar ${row.name}`" @click="open(row)">Editar</button>
+            <button v-if="can('sales.customers')" type="button" class="panel-icon-button panel-icon-button--neutral" :aria-label="`Editar ${row.name}`" @click="open(row)">Editar</button>
             <RouterLink class="panel-link" :to="{ name: 'sale-new', query: { cliente: row.id } }">Vender</RouterLink>
           </div>
         </template>

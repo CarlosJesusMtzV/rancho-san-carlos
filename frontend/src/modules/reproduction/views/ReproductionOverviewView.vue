@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBadge, UiBasePage, UiButton, UiCard, UiChip, UiDialog, UiField, UiLoadError, UiMetric, UiTable, UiToast } from '../../../shared/components'
 import { formatDate } from '../../../shared/utils/format'
 import { listVisits, type VetVisitSummary } from '../../animal-health'
@@ -131,8 +132,8 @@ onMounted(async () => {
   <UiBasePage fluid title="Reproducción" description="Montas naturales, diagnóstico de preñez del veterinario y partos.">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink class="btn" :to="{ name: 'breeding-new' }">Registrar monta</RouterLink>
-        <RouterLink class="btn secondary" :to="{ name: 'birth-new' }">Registrar parto</RouterLink>
+        <RouterLink v-if="can('repro.write')" class="btn" :to="{ name: 'breeding-new' }">Registrar monta</RouterLink>
+        <RouterLink v-if="can('repro.write')" class="btn secondary" :to="{ name: 'birth-new' }">Registrar parto</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'reproduction-history' }">Historial</RouterLink>
       </div>
     </template>
@@ -188,9 +189,9 @@ onMounted(async () => {
           </template>
           <template #cell-animalId="{ row }">
             <div class="rp-actions">
-              <button v-if="row.breeding && ['pending', 'pregnant'].includes(row.breeding.outcome)" type="button" class="panel-icon-button panel-icon-button--neutral" @click="openCheck(row)">Diagnóstico</button>
-              <RouterLink v-if="row.breeding && ['pending', 'pregnant'].includes(row.breeding.outcome)" class="panel-link" :to="{ name: 'birth-new', query: { madre: row.animalId } }">Parto</RouterLink>
-              <RouterLink v-else class="panel-link" :to="{ name: 'breeding-new', query: { hembra: row.animalId } }">Montar</RouterLink>
+              <button v-if="can('repro.write') && row.breeding && ['pending', 'pregnant'].includes(row.breeding.outcome)" type="button" class="panel-icon-button panel-icon-button--neutral" @click="openCheck(row)">Diagnóstico</button>
+              <RouterLink v-if="can('repro.write') && row.breeding && ['pending', 'pregnant'].includes(row.breeding.outcome)" class="panel-link" :to="{ name: 'birth-new', query: { madre: row.animalId } }">Parto</RouterLink>
+              <RouterLink v-else-if="can('repro.write')" class="panel-link" :to="{ name: 'breeding-new', query: { hembra: row.animalId } }">Montar</RouterLink>
               <RouterLink class="panel-link" :to="{ name: 'reproduction-history', query: { hembra: row.animalId } }">Historial</RouterLink>
             </div>
           </template>

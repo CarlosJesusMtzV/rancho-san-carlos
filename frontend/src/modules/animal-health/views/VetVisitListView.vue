@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiMetric, UiTable } from '../../../shared/components'
 import { formatDate, formatMoney, todayIso } from '../../../shared/utils/format'
 import { createVisit, listVisits } from '../api/healthApi'
@@ -18,16 +19,21 @@ const saveError = ref('')
 const saving = ref(false)
 
 const formTotal = computed(() => (Number(form.serviceFee) || 0) + (Number(form.medicationCost) || 0))
-const totalPaid = computed(() => (visits.value ?? []).reduce((sum, visit) => sum + visit.total, 0))
-const totalMedication = computed(() => (visits.value ?? []).reduce((sum, visit) => sum + visit.medicationCost, 0))
+const totalPaid = computed(() => (visits.value ?? []).reduce((sum, visit) => sum + (visit.total ?? 0), 0))
+const totalMedication = computed(() => (visits.value ?? []).reduce((sum, visit) => sum + (visit.medicationCost ?? 0), 0))
 
 const columns = [
   { key: 'visitDate' as const, label: 'Fecha' },
   { key: 'vetName' as const, label: 'Veterinario' },
   { key: 'animalCount' as const, label: 'Animales' },
-  { key: 'serviceFee' as const, label: 'Honorarios' },
-  { key: 'medicationCost' as const, label: 'Medicamentos' },
-  { key: 'total' as const, label: 'Total' },
+  // Los pagos al veterinario solo los ven los administradores.
+  ...(can('payments.view')
+    ? [
+        { key: 'serviceFee' as const, label: 'Honorarios' },
+        { key: 'medicationCost' as const, label: 'Medicamentos' },
+        { key: 'total' as const, label: 'Total' },
+      ]
+    : []),
 ]
 
 async function load(): Promise<void> {
@@ -75,18 +81,20 @@ onMounted(load)
     </template>
 
     <div class="stack">
-      <UiCard title="Nueva visita">
+      <UiCard v-if="can('health.write')" title="Nueva visita">
         <form class="panel-form" novalidate @submit.prevent="save">
           <UiField v-model="form.visitDate" label="Fecha *" type="date" :max="today" required />
           <UiField v-model="form.vetName" label="Veterinario *" maxlength="120" placeholder="Ej. MVZ Juan Pérez" required />
-          <UiField v-model="form.serviceFee" label="Honorarios ($)" type="number" min="0" step="0.01" inputmode="decimal" />
-          <UiField v-model="form.medicationCost" label="Medicamentos ($)" type="number" min="0" step="0.01" inputmode="decimal" />
+          <template v-if="can('payments.view')">
+            <UiField v-model="form.serviceFee" label="Honorarios ($)" type="number" min="0" step="0.01" inputmode="decimal" />
+            <UiField v-model="form.medicationCost" label="Medicamentos ($)" type="number" min="0" step="0.01" inputmode="decimal" />
+          </template>
           <div class="panel-span">
-            <UiField v-model="form.notes" label="Notas" maxlength="255" placeholder="Ej. Pagado en efectivo" />
+            <UiField v-model="form.notes" label="Notas" maxlength="255" />
           </div>
           <div class="panel-span panel-actions">
             <UiButton type="submit" :loading="saving">Registrar visita</UiButton>
-            <span class="panel-muted">Total: <strong>{{ formatMoney(formTotal) }}</strong></span>
+            <span v-if="can('payments.view')" class="panel-muted">Total: <strong>{{ formatMoney(formTotal) }}</strong></span>
           </div>
         </form>
         <UiAlert v-if="saveError" tone="danger" title="No se guardó">{{ saveError }}</UiAlert>
@@ -95,7 +103,7 @@ onMounted(load)
       <UiLoadError v-if="error" :message="error" @retry="load" />
       <p v-else-if="!visits" aria-busy="true">Cargando…</p>
       <template v-else>
-        <div class="panel-metrics">
+        <div v-if="can('payments.view')" class="panel-metrics">
           <UiCard metric><UiMetric label="Pagado al veterinario" :value="formatMoney(totalPaid)" :description="`${visits.length} visita${visits.length === 1 ? '' : 's'}`" /></UiCard>
           <UiCard metric><UiMetric label="De eso, medicamentos" :value="formatMoney(totalMedication)" /></UiCard>
         </div>

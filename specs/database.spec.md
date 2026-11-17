@@ -4,7 +4,7 @@
 
 Contrato del esquema PostgreSQL definido en [`database.sql`](../database.sql). Parte del diseño original `BDPRY.sql` (50 tablas, sintaxis de SQL Server exportada de un diagrama) y lo corrige para PostgreSQL 15 y las convenciones del template.
 
-- 54 tablas, 7 vistas y 10 triggers de reglas sanitarias, de quesería, de matanza y de ventas, todo en `snake_case` e inglés.
+- 56 tablas, 7 vistas y 10 triggers de reglas sanitarias, de quesería, de matanza y de ventas, todo en `snake_case` e inglés.
 - Solo ganado bovino y caprino; reglas de dominio en [`domain.spec.md`](domain.spec.md).
 - Se ejecuta al inicializar un volumen nuevo. No migra bases existentes.
 
@@ -35,7 +35,7 @@ Se conservan en todas las tablas, renombradas:
 | `idUserDelete` / `dateDelete` | `deleted_by` / `deleted_at` | Borrado lógico |
 | `status` | `status` | 1 activo, 0 inactivo |
 
-`created_by`, `updated_by` y `deleted_by` son llaves foráneas a `users` y aceptan nulo para permitir la carga inicial.
+`created_by`, `updated_by` y `deleted_by` son llaves foráneas a `users`; el backend las llena con la cuenta de la sesión y aceptan nulo para la carga inicial y los datos anteriores al inicio de sesión.
 
 ## Equivalencia de tablas
 
@@ -93,7 +93,7 @@ Se conservan en todas las tablas, renombradas:
 | `Transaccion` | `transactions` |  |
 | `Gasto` | `expenses` |  |
 | `CuentaBancaria` | `bank_accounts` | Guarda alias y últimos 4 dígitos, no el número completo. |
-| `Usuario` | `users` | Agrega `role`. |
+| `Usuario` | `users`, `roles`, `user_roles` | Solo se guarda el hash de la contraseña. Una cuenta tiene uno o varios roles por negocio (general, ganadería, quesería); los permisos de cada rol se definen en el backend. Lleva contraseña temporal, intentos fallidos y bloqueo. |
 
 ## Vistas
 
@@ -130,7 +130,7 @@ Los de retiro usan `fn_withdrawal_allowed_from(animal, 'milk' \| 'meat', fecha)`
 
 ## Datos iniciales
 
-Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasitante), 4 tipos de producto, 6 productos y 3 tipos de cliente. No se cargan usuarios, animales ni datos personales.
+Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasitante), 4 tipos de producto, 6 productos, 3 tipos de cliente y 7 roles. No se cargan usuarios, animales ni datos personales.
 
 ## Cambios a bases existentes
 
@@ -144,6 +144,7 @@ Solo catálogos: 2 especies, 3 tipos de insumo (Medicamento, Vacuna, Desparasita
 | 4 | `2026-11-13-04-queseria.sql` | Tandas con presentaciones, compras de asadero, mermas, `v_cheese_stock`, renglones de pedido por presentación o compra, asadero como reventa; se detiene si ya hay queso registrado |
 | 5 | `2026-11-13-05-matanza.sql` | Jornadas de matanza (`slaughter_runs`), `kid_slaughters` ligada a la jornada con peso vivo obligatorio, un cabrito por matanza vigente; se detiene si ya hay matanzas |
 | 6 | `2026-11-13-06-ventas.sql` | Encargos y entrega en `orders`, ganado y canal por kilo, pago por pedido, factura sin estado de pago, `tg_order_items_check`, `tg_orders_check`, tipos de cliente; se detiene si ya hay ventas |
+| 7 | `2026-11-16-07-acceso.sql` | Cuentas sin columna `role`, tablas `roles` y `user_roles`, los 7 roles; se detiene si ya hay cuentas |
 
 Comprobado para cada script: aplicarlo sobre una base creada con el esquema anterior deja el mismo esquema que el `database.sql` correspondiente (comparación con `pg_dump -s`).
 
@@ -161,7 +162,7 @@ Mapeadas: `species`, `breeds`, `animal_lots`, `animals`, `weight_records` y la v
 Verificado en PostgreSQL 16 local el 2026-11-10 (la imagen del proyecto usa PostgreSQL 15; falta repetirlo con Docker):
 
 1. El script completo corre en una transacción sin errores.
-2. 54 tablas, 7 vistas, 10 triggers, 0 identificadores con mayúsculas.
+2. 56 tablas, 7 vistas, 10 triggers, 0 identificadores con mayúsculas.
 3. Ordeña de cabra aceptada; ordeña de bovino, de macho o de cabra con retiro rechazada; aceptada al terminar el retiro.
 4. Matanza de bovino, de cabrito con retiro o con canal mayor que el peso vivo rechazada; aceptada tras el retiro.
 5. Raza o lote de otra especie y tercera especie rechazados.

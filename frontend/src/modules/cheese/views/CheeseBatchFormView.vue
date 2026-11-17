@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiToast } from '../../../shared/components'
 import { addDays, formatDate, todayIso } from '../../../shared/utils/format'
 import { createBatch, deleteBatch, getBatch, getCatalog, listMilkLots, updateBatch } from '../api/cheeseApi'
@@ -161,7 +162,7 @@ onMounted(load)
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'cheese' }">Volver a quesería</RouterLink>
-        <UiButton v-if="batch" variant="danger" @click="deleteOpen = true">Eliminar</UiButton>
+        <UiButton v-if="batch && can('cheese.delete')" variant="danger" @click="deleteOpen = true">Eliminar</UiButton>
       </div>
     </template>
 
@@ -193,7 +194,7 @@ onMounted(load)
         <p class="panel-muted">
           Canasta y panela duran de {{ batchShelfLifeDays }} a {{ batchMaxShelfLifeDays }} días.
           <template v-if="lot">Ordeña del {{ formatDate(lot.collectionDate) }} ({{ lot.code }}): {{ lot.totalLiters }} L.</template>
-          <RouterLink v-if="batch && lot" class="panel-link" :to="{ name: 'milking-day', params: { id: lot.id } }">Ver ordeña</RouterLink>
+          <RouterLink v-if="batch && lot && can('milking.read')" class="panel-link" :to="{ name: 'milking-day', params: { id: lot.id } }">Ver ordeña</RouterLink>
         </p>
       </UiCard>
 
@@ -215,7 +216,7 @@ onMounted(load)
       </UiCard>
 
       <div class="panel-actions">
-        <UiButton type="submit" :loading="saving">{{ batch ? 'Guardar cambios' : 'Registrar tanda' }}</UiButton>
+        <UiButton v-if="can('cheese.produce')" type="submit" :loading="saving">{{ batch ? 'Guardar cambios' : 'Registrar tanda' }}</UiButton>
         <RouterLink class="btn secondary" :to="{ name: 'cheese' }">Cancelar</RouterLink>
       </div>
     </form>

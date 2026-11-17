@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiChip, UiField, UiLoadError, UiMetric, UiTable } from '../../../shared/components'
 import { listAnimals } from '../api/herdApi'
 import LifecycleBadge from '../components/LifecycleBadge.vue'
@@ -129,7 +130,7 @@ onMounted(() => {
   <UiBasePage fluid title="Hato" description="Bovinos para carne y caprinos para cabritos y leche.">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink class="btn" :to="{ name: 'herd-new' }">Registrar animal</RouterLink>
+        <RouterLink v-if="can('herd.write')" class="btn" :to="{ name: 'herd-new' }">Registrar animal</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'herd-calves' }">Becerros para venta</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'herd-catalog' }">Razas y lotes</RouterLink>
       </div>

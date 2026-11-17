@@ -18,6 +18,7 @@ Antes de editar, leer `AGENTS.md` (raíz), el `AGENTS.md` del área afectada y `
 7. Un animal vendido, sacrificado, muerto o desechado deja de estar `active` y lleva `exit_date`.
 8. Los triggers lanzan SQLSTATE `23514` con mensaje en español: el backend lo devuelve como 422.
 9. No mostrar sellos ni nombres de autoridades (SINIIGA, SENASICA, NOM) sin certificación real.
+10. El panel exige sesión. Hay siete roles en dos negocios: ganadería (administrador ganadero, vaquero, supervisor de ordeña) y quesería (administrador de quesería, quesero, vendedor de queso), más el dueño. Los precios los ve cualquiera; los pagos y costos, solo los administradores. El veterinario y el matancero son externos y no tienen cuenta. Matriz en `backend/Modules/Access/specs/access.spec.md`.
 
 Si una petición contradice estas reglas, detenerse y preguntar: es una decisión de producto.
 

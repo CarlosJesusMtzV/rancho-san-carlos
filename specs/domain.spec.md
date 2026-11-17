@@ -130,6 +130,18 @@ Ventas, confirmado el 2026-11-13:
 | Encargos | A veces encargan: el pedido aparta lo vendido y se entrega y cobra después. |
 | Entregas | El queso se entrega a domicilio a veces; el ganado lo recogen los compradores. |
 
+Acceso y roles, confirmado el 2026-11-16:
+
+| Decisión | Resultado |
+| --- | --- |
+| Quién usa el panel | Trabajadores con su propia cuenta; capturan desde una computadora. |
+| Ganadería | Administrador ganadero, vaqueros (animales, sanidad, reproducción, ordeña y matanza) y un supervisor de ordeña (la ordeña es con máquinas). |
+| Quesería | Administrador de quesería, queseros (cuánto queso salió; sin ingredientes ni insumos) y vendedor de queso. |
+| Precios y pagos | Los precios los ve cualquiera, incluidos los clientes en el sitio. Los pagos y costos, solo los administradores. |
+| Matanza | La captura el vaquero sin ver el pago al rastro; el pago lo pone un administrador. |
+| Clientes | Sin cuenta: piden desde el sitio público si hay existencia y el administrador confirma (pendiente de construir). |
+| Empleados | Por ahora solo cuentas de acceso; sin puestos, nómina ni asistencia. |
+
 Tomadas al diseñar (cambiables sin tocar la base):
 
 | Decisión | Valor |
@@ -141,6 +153,8 @@ Tomadas al diseñar (cambiables sin tocar la base):
 | Códigos de quesería | Tanda `QF-AAAAMMDD` (día de la ordeña); compra `CQ-AAAAMMDD` |
 | Canal disponible | Sin renglón en un pedido vigente (no cancelado) |
 | Queso caducado | No se vende; se registra como merma |
+| Quien vende cobra | El vendedor registra el cobro al entregar aunque no tenga `payments.view`; el resumen de ventas y las facturas son de administradores |
+| Contraseñas | Las pone y restablece el dueño como temporales; cada quien la cambia al entrar. Cinco fallos bloquean 15 minutos |
 | Impuestos de la factura | 0 por omisión (alimentos y ganado a tasa 0); se pueden indicar |
 
 Pendientes:
@@ -149,11 +163,10 @@ Pendientes:
 | --- | --- |
 | Precios: $120/kg canasta, $120 panela, $80 asadero | Tomados del sitio; confirmar. El precio de compra del asadero se registra en cada compra. |
 | Precio de referencia por kilo de cabrito en pie, en canal y becerro | Sin definir; se pone en cada venta |
-| Autenticación y roles del panel | Sin definir; la plantilla ya no trae login |
 
 ## Aceptación
 
-1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 54 tablas, 7 vistas y 10 triggers en `snake_case`.
+1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 56 tablas, 7 vistas y 10 triggers en `snake_case`.
 2. Registrar ordeña de un bovino, de un macho o de una cabra con retiro de leche falla en la base de datos.
 3. Registrar la matanza de un bovino o de un cabrito con retiro de carne falla.
 4. Asignar a un animal una raza o lote de otra especie falla.

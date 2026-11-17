@@ -36,6 +36,18 @@ python scripts/setup-dev.py --project-name tecnm-rancho-san-carlos
 
 En Windows se usa `python` en lugar de `bash scripts/setup-dev.sh`, porque ese script busca `python3` y Windows suele instalarlo como `python`.
 
+Al terminar, el script muestra el **usuario y la contraseña temporal del dueño** (también quedan en `.env`, que no se sube a Git). Entra en https://localhost:5173/panel, cambia la contraseña y crea las cuentas de los demás en **Usuarios**.
+
+| Rol | Negocio | Qué hace |
+| --- | --- | --- |
+| Dueño | General | Todo, y administra usuarios |
+| Administrador ganadero | Ganadería | Hato, sanidad, reproducción, ordeña, matanza y venta de ganado, con pagos |
+| Vaquero | Ganadería | Captura animales, sanidad, reproducción, ordeña y matanza; no elimina ni ve pagos |
+| Supervisor de ordeña | Ganadería | Registra y corrige las ordeñas |
+| Administrador de quesería | Quesería | Tandas, compras de asadero, existencias y venta de queso, con pagos |
+| Quesero | Quesería | Registra tandas y mermas |
+| Vendedor de queso | Quesería | Vende y entrega queso |
+
 | Servicio | Dirección |
 | --- | --- |
 | Sitio y panel | https://localhost:5173 |
@@ -59,7 +71,10 @@ docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-04-queseria.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-05-matanza.sql
 docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-13-06-ventas.sql
+docker compose exec -T db psql -U tecnm_app -d tecnm_template -v ON_ERROR_STOP=1 < docs/migrations/2026-11-16-07-acceso.sql
 ```
+
+Después de la migración 07 vuelve a correr `python scripts/setup-dev.py` con tu mismo `--project-name`: reconstruye la API, genera la contraseña temporal del dueño y la muestra al final.
 
 Para empezar de cero con otro volumen usa otro nombre de proyecto:
 
@@ -109,5 +124,7 @@ Después crea un repositorio vacío en GitHub y sigue las instrucciones de «pus
 | `python3: command not found` o se abre la Microsoft Store | Usa `python scripts/setup-dev.py`; en Windows desactiva los «alias de ejecución de aplicaciones» de Python |
 | `Falta docker` o `Cannot connect to the Docker daemon` | Abre Docker Desktop y espera a que diga «Engine running» |
 | `argument --project-name: Usa un nombre como tecnm-servicio` | El nombre debe empezar con `tecnm-`, por ejemplo `--project-name tecnm-rancho-prueba` |
+| El panel pide usuario y no tengo ninguno | La contraseña temporal del dueño está en `.env` (`TECNM_OWNER_PASSWORD`); solo sirve mientras no existan cuentas |
+| Olvidé mi contraseña | El dueño la restablece en **Usuarios**. No hay recuperación si el único dueño la olvida: conviene tener dos cuentas de dueño |
 | Puerto 5173 o 7001 ocupado | Agrega `--frontend-port 5180 --backend-port 7010` |
 | `$'\r': command not found` al correr un `.sh` | El archivo tomó finales de línea de Windows; `.gitattributes` lo evita en clones nuevos. Arreglo: `sed -i 's/\r$//' scripts/*.sh` |

@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiBasePage, UiCard, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { formatDate, formatMoney } from '../../../shared/utils/format'
 import { deleteAdjustment, listAdjustments, listBatches, listPurchases } from '../api/cheeseApi'
@@ -44,7 +45,8 @@ const adjustmentColumns = [
 async function load(): Promise<void> {
   error.value = ''
   try {
-    ;[batches.value, purchases.value, adjustments.value] = await Promise.all([listBatches(), listPurchases(), listAdjustments()])
+    // Las compras llevan costos: solo las ve quien administra la quesería.
+    ;[batches.value, purchases.value, adjustments.value] = await Promise.all([listBatches(), can('cheese.purchases') ? listPurchases() : [], listAdjustments()])
   } catch (cause) {
     error.value = getApiErrorMessage(cause)
   }
@@ -68,7 +70,7 @@ onMounted(load)
 </script>
 
 <template>
-  <UiBasePage fluid title="Historial de quesería" description="Tandas, compras de asadero y salidas que no son venta, de los últimos 90 días.">
+  <UiBasePage fluid title="Historial de quesería" :description="can('cheese.purchases') ? 'Tandas, compras de asadero y salidas que no son venta, de los últimos 90 días.' : 'Tandas y salidas que no son venta, de los últimos 90 días.'">
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'cheese' }">Volver a quesería</RouterLink>
@@ -85,7 +87,8 @@ onMounted(load)
           <template #cell-code="{ row }"><RouterLink class="panel-link" :to="{ name: 'cheese-batch', params: { id: row.id } }">{{ row.code }}</RouterLink></template>
           <template #cell-madeOn="{ row }">{{ formatDate(row.madeOn) }}</template>
           <template #cell-collectionDate="{ row }">
-            <RouterLink class="panel-link" :to="{ name: 'milking-day', params: { id: row.milkLotId } }">{{ formatDate(row.collectionDate) }}</RouterLink>
+            <RouterLink v-if="can('milking.read')" class="panel-link" :to="{ name: 'milking-day', params: { id: row.milkLotId } }">{{ formatDate(row.collectionDate) }}</RouterLink>
+            <template v-else>{{ formatDate(row.collectionDate) }}</template>
           </template>
           <template #cell-litersUsed="{ row }">{{ row.litersUsed }} L</template>
           <template #cell-outputs="{ row }">{{ row.outputs.map((output) => `${formatQuantity(output.quantity, output.saleUnit)} de ${output.productName.toLowerCase()}`).join(', ') }}</template>
@@ -93,7 +96,7 @@ onMounted(load)
         </UiTable>
       </UiCard>
 
-      <UiCard title="Compras de asadero" :description="`${purchases.length} registrada${purchases.length === 1 ? '' : 's'} · ${formatMoney(purchases.reduce((sum, item) => sum + item.total, 0))}`">
+      <UiCard v-if="can('cheese.purchases')" title="Compras de asadero" :description="`${purchases.length} registrada${purchases.length === 1 ? '' : 's'} · ${formatMoney(purchases.reduce((sum, item) => sum + item.total, 0))}`">
         <p v-if="purchases.length === 0" class="panel-muted">Sin compras registradas.</p>
         <UiTable v-else label="Compras de queso de reventa" :columns="purchaseColumns" :rows="purchases">
           <template #cell-code="{ row }"><RouterLink class="panel-link" :to="{ name: 'cheese-purchase', params: { id: row.id } }">{{ row.code }}</RouterLink></template>
@@ -114,6 +117,7 @@ onMounted(load)
           <template #cell-notes="{ row }">{{ row.notes ?? '—' }}</template>
           <template #cell-id="{ row }">
             <button
+              v-if="can('cheese.delete')"
               type="button"
               class="panel-icon-button"
               :disabled="deletingId !== null"

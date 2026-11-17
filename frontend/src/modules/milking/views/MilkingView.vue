@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiMetric, UiTable, UiToast } from '../../../shared/components'
 import { formatDate, todayIso } from '../../../shared/utils/format'
 import { createDay, getSummary, listDays, listGoats } from '../api/milkingApi'
@@ -121,7 +122,7 @@ onMounted(async () => {
         <UiCard metric><UiMetric label="Promedio diario, 30 días" :value="liters(summary.last30Days.averagePerDay)" :description="trend ?? `${summary.last30Days.days} ordeñas`" /></UiCard>
       </div>
 
-      <UiCard title="Registrar ordeña">
+      <UiCard v-if="can('milking.write')" title="Registrar ordeña">
         <form class="stack" novalidate @submit.prevent="save">
           <div class="panel-form">
             <UiField v-model="form.date" label="Fecha *" type="date" :max="today" required />

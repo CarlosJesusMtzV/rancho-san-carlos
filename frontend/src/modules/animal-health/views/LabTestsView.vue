@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBadge, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
 import { formatDate, todayIso } from '../../../shared/utils/format'
 import { listAnimals, type AnimalSummary } from '../../herd'
@@ -100,7 +101,7 @@ onMounted(load)
     <p v-else-if="!tests" aria-busy="true">Cargando…</p>
 
     <div v-else class="stack">
-      <UiCard title="Nueva muestra">
+      <UiCard v-if="can('health.write')" title="Nueva muestra">
         <form class="panel-form" novalidate @submit.prevent="save">
           <UiField v-model="form.animalId" as="select" label="Animal *" :options="animalOptions" />
           <UiField v-model="form.sampleDate" label="Fecha de muestra *" type="date" :max="today" required />

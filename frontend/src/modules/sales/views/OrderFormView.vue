@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { getApiErrorMessage } from '../../../shared/api/errors'
+import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBadge, UiBasePage, UiButton, UiCard, UiDialog, UiField, UiLoadError, UiRadio, UiTable, UiToast } from '../../../shared/components'
 import { formatDate, formatMoney, todayIso } from '../../../shared/utils/format'
 import CustomerDialog from '../components/CustomerDialog.vue'
@@ -291,7 +292,7 @@ onMounted(load)
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'sales' }">Volver a ventas</RouterLink>
         <UiButton v-if="order?.status === 'confirmed'" @click="deliverOpen = true; actionError = ''">Entregar y cobrar</UiButton>
-        <UiButton v-if="order && order.status !== 'cancelled'" variant="danger" @click="cancelOpen = true; actionError = ''">
+        <UiButton v-if="order && order.status !== 'cancelled' && (order.status === 'confirmed' || can('sales.cancel'))" variant="danger" @click="cancelOpen = true; actionError = ''">
           {{ order.status === 'delivered' ? 'Cancelar venta' : 'Cancelar encargo' }}
         </UiButton>
       </div>
@@ -323,7 +324,7 @@ onMounted(load)
           <template #cell-total="{ row }"><strong>{{ formatMoney(row.total) }}</strong></template>
         </UiTable>
       </UiCard>
-      <UiCard v-if="order.status === 'delivered'" title="Factura" description="Se anota el folio de la factura que emitiste; el sistema no timbra.">
+      <UiCard v-if="order.status === 'delivered' && can('payments.view')" title="Factura" description="Se anota el folio de la factura que emitiste; el sistema no timbra.">
         <div v-if="order.invoice" class="stack">
           <p>Folio <strong>{{ order.invoice.fiscalFolio }}</strong> del {{ formatDate(order.invoice.issueDate) }} · subtotal {{ formatMoney(order.invoice.subtotal) }}, impuestos {{ formatMoney(order.invoice.taxes) }}, total <strong>{{ formatMoney(order.invoice.total) }}</strong>.</p>
           <div class="panel-actions"><UiButton variant="secondary" :loading="acting" @click="removeInvoice">Quitar factura</UiButton></div>
@@ -351,7 +352,7 @@ onMounted(load)
         <div class="panel-form">
           <div class="sl-inline">
             <UiField v-model="form.customerId" as="select" label="Cliente *" :options="customerOptions" />
-            <UiButton variant="secondary" @click="customerOpen = true">Nuevo cliente</UiButton>
+            <UiButton v-if="can('sales.customers')" variant="secondary" @click="customerOpen = true">Nuevo cliente</UiButton>
           </div>
           <UiField v-model="form.orderDate" label="Fecha *" type="date" :max="today" />
           <fieldset v-if="!order" class="panel-radios panel-span">
@@ -370,7 +371,7 @@ onMounted(load)
         </div>
       </UiCard>
 
-      <UiCard title="Productos" description="Queso por kg o pieza; ganado en pie y canal por kilo.">
+      <UiCard title="Productos" :description="can('sales.cheese') && can('sales.livestock') ? 'Queso por kg o pieza; ganado en pie y canal por kilo.' : can('sales.cheese') ? 'Queso por kg o pieza.' : 'Ganado en pie y canal, por kilo.'">
         <p v-if="lines.length === 0" class="panel-muted">Agrega lo que se vende.</p>
         <div v-for="(row, index) in lines" :key="row.key" class="sl-line">
           <UiField
@@ -396,9 +397,9 @@ onMounted(load)
           <button type="button" class="panel-icon-button" :aria-label="`Quitar el renglón ${index + 1}`" @click="removeLine(row.key)">Quitar</button>
         </div>
         <div class="panel-actions">
-          <UiButton variant="secondary" @click="addLine('cheese')">Agregar queso</UiButton>
-          <UiButton variant="secondary" @click="addLine('animal')">Agregar ganado en pie</UiButton>
-          <UiButton variant="secondary" @click="addLine('carcass')">Agregar canal</UiButton>
+          <UiButton v-if="can('sales.cheese')" variant="secondary" @click="addLine('cheese')">Agregar queso</UiButton>
+          <UiButton v-if="can('sales.livestock')" variant="secondary" @click="addLine('animal')">Agregar ganado en pie</UiButton>
+          <UiButton v-if="can('sales.livestock')" variant="secondary" @click="addLine('carcass')">Agregar canal</UiButton>
         </div>
         <p v-if="withdrawn.length" class="panel-muted">Con retiro de carne, no se venden: {{ withdrawn.map((item) => `${item.visualTag} (hasta el ${formatDate(item.meatAllowedFrom)})`).join(', ') }}.</p>
         <p class="sl-total">Total <strong>{{ formatMoney(total) }}</strong></p>

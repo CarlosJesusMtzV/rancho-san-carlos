@@ -21,7 +21,7 @@ const columns = [
   { key: 'sex' as const, label: 'Sexo' },
   { key: 'ageMonths' as const, label: 'Edad' },
   { key: 'lastWeightKg' as const, label: 'Último peso' },
-  { key: 'lotCode' as const, label: 'Lote' },
+  { key: 'lotCode' as const, label: 'Situación' },
   { key: 'meatAllowedFrom' as const, label: 'Retiro sanitario' },
 ]
 

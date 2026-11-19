@@ -6,6 +6,17 @@ namespace TecNM.Api.Data.Configurations;
 
 // Las llaves compuestas por especie (hembra y semental de la misma especie) viven en database.sql.
 
+public sealed class BreedingSeasonConfiguration : IEntityTypeConfiguration<BreedingSeason>
+{
+    public void Configure(EntityTypeBuilder<BreedingSeason> builder)
+    {
+        builder.ToTable("breeding_seasons");
+        builder.HasOne(season => season.Male).WithMany().HasForeignKey(season => season.MaleId);
+        builder.HasMany(season => season.Females).WithOne(breeding => breeding.Season).HasForeignKey(breeding => breeding.BreedingSeasonId);
+        builder.HasQueryFilter(season => season.DeletedAt == null);
+    }
+}
+
 public sealed class BreedingEventConfiguration : IEntityTypeConfiguration<BreedingEvent>
 {
     public void Configure(EntityTypeBuilder<BreedingEvent> builder)

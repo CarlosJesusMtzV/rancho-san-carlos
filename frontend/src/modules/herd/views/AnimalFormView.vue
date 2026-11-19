@@ -45,8 +45,8 @@ const breedOptions = computed(() => [
   ...breedsFor(species.value).map((breed) => ({ value: String(breed.id), label: breed.name })),
 ])
 const lotOptions = computed(() => [
-  { value: '', label: 'Sin lote' },
-  ...lotsFor(species.value).map((lot) => ({ value: String(lot.id), label: lot.code })),
+  { value: '', label: 'Sin situación' },
+  ...lotsFor(species.value).map((lot) => ({ value: String(lot.id), label: lot.description ?? lot.code })),
 ])
 const stageOptions = computed(() => [
   { value: '', label: 'Sin etapa' },
@@ -179,7 +179,7 @@ onMounted(load)
 
     <UiAlert v-else-if="catalog && !hasBreeds" tone="warning" title="Primero registra las razas">
       Necesitas al menos una raza de la especie para dar de alta animales.
-      <RouterLink class="panel-link" :to="{ name: 'herd-catalog' }">Ir a razas y lotes</RouterLink>
+      <RouterLink class="panel-link" :to="{ name: 'herd-catalog' }">Ir a razas y situaciones</RouterLink>
     </UiAlert>
 
     <form v-else class="stack" novalidate @submit.prevent="save">
@@ -196,7 +196,7 @@ onMounted(load)
           <UiField v-model="form.officialTag" label="Arete oficial" maxlength="30" autocomplete="off" />
           <UiField v-model="form.sex" as="select" label="Sexo *" :options="sexOptions" required />
           <UiField v-model="form.breedId" as="select" label="Raza *" :options="breedOptions" required />
-          <UiField v-model="form.lotId" as="select" label="Lote" :options="lotOptions" />
+          <UiField v-model="form.lotId" as="select" label="Situación" :options="lotOptions" />
           <UiField v-model="form.productionStage" as="select" label="Etapa productiva" :options="stageOptions" />
         </div>
       </UiCard>

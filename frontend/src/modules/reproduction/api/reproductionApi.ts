@@ -1,5 +1,5 @@
 import { http } from '../../../shared/api/http'
-import type { BirthItem, BreedingItem, BreedingOutcome, CheckResult, FemaleFilter, FemaleStatus, OffspringInput } from '../types/reproduction'
+import type { BirthItem, BreedingItem, BreedingOutcome, CheckResult, EmpadreItem, FemaleFilter, FemaleStatus, OffspringInput } from '../types/reproduction'
 
 const base = '/reproduction'
 
@@ -7,12 +7,16 @@ export async function listFemales(query: { speciesId?: 1 | 2; status?: FemaleFil
   return (await http.get<FemaleStatus[]>(`${base}/females`, { params: query })).data
 }
 
+export async function listEmpadres(query: { speciesId?: 1 | 2 } = {}): Promise<EmpadreItem[]> {
+  return (await http.get<EmpadreItem[]>(`${base}/empadres`, { params: query })).data
+}
+
 export async function listBreedings(query: { femaleId?: number; outcome?: BreedingOutcome } = {}): Promise<BreedingItem[]> {
   return (await http.get<BreedingItem[]>(`${base}/breedings`, { params: query })).data
 }
 
-export async function createBreeding(input: { femaleId: number; maleId: number; matingDate: string; notes: string | null }): Promise<BreedingItem> {
-  return (await http.post<BreedingItem>(`${base}/breedings`, input)).data
+export async function createEmpadre(input: { maleId: number; femaleIds: number[]; startDate: string; notes: string | null }): Promise<EmpadreItem> {
+  return (await http.post<EmpadreItem>(`${base}/empadres`, input)).data
 }
 
 export async function deleteBreeding(id: number): Promise<void> {

@@ -59,11 +59,11 @@ const counts = computed(() => ({
 
 // Visitas posteriores a la monta: las únicas que el backend acepta para diagnosticar.
 const visitOptions = computed(() => {
-  const matingDate = checkTarget.value?.breeding?.matingDate ?? ''
+  const startDate = checkTarget.value?.breeding?.startDate ?? ''
   return [
     { value: '', label: 'Selecciona la visita' },
     ...visits.value
-      .filter((visit) => visit.visitDate > matingDate)
+      .filter((visit) => visit.visitDate > startDate)
       .map((visit) => ({ value: String(visit.id), label: `${formatDate(visit.visitDate)} · ${visit.vetName}` })),
   ]
 })
@@ -71,7 +71,7 @@ const visitOptions = computed(() => {
 const columns = [
   { key: 'visualTag' as const, label: 'Hembra' },
   { key: 'speciesId' as const, label: 'Especie' },
-  { key: 'lotCode' as const, label: 'Lote' },
+  { key: 'situation' as const, label: 'Situación' },
   { key: 'breeding' as const, label: 'Estado' },
   { key: 'daysToDue' as const, label: 'Parto probable' },
   { key: 'birthCount' as const, label: 'Partos' },
@@ -132,7 +132,7 @@ onMounted(async () => {
   <UiBasePage fluid title="Reproducción" description="Montas naturales, diagnóstico de preñez del veterinario y partos.">
     <template #actions>
       <div class="panel-toolbar">
-        <RouterLink v-if="can('repro.write')" class="btn" :to="{ name: 'breeding-new' }">Registrar monta</RouterLink>
+        <RouterLink v-if="can('repro.write')" class="btn" :to="{ name: 'empadre-new' }">Registrar empadre</RouterLink>
         <RouterLink v-if="can('repro.write')" class="btn secondary" :to="{ name: 'birth-new' }">Registrar parto</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'reproduction-history' }">Historial</RouterLink>
       </div>
@@ -168,11 +168,11 @@ onMounted(async () => {
             <RouterLink class="panel-link" :to="`/panel/hato/${row.animalId}`">{{ row.visualTag }}</RouterLink>
           </template>
           <template #cell-speciesId="{ row }"><SpeciesTag :species-id="row.speciesId" /></template>
-          <template #cell-lotCode="{ row }">{{ row.lotCode ?? '—' }}</template>
+          <template #cell-situation="{ row }">{{ row.situation ?? '—' }}</template>
           <template #cell-breeding="{ row }">
             <template v-if="row.breeding">
               <UiBadge :tone="outcomeTone(row.breeding.outcome)">{{ outcomeLabels[row.breeding.outcome] }}</UiBadge>
-              <span class="panel-muted"> · {{ row.breeding.maleTag }}, {{ formatDate(row.breeding.matingDate) }}</span>
+              <span class="panel-muted"> · {{ row.breeding.maleTag }}, {{ formatDate(row.breeding.startDate) }}</span>
             </template>
             <span v-else class="panel-muted">Sin montas</span>
           </template>
@@ -191,7 +191,7 @@ onMounted(async () => {
             <div class="rp-actions">
               <button v-if="can('repro.write') && row.breeding && ['pending', 'pregnant'].includes(row.breeding.outcome)" type="button" class="panel-icon-button panel-icon-button--neutral" @click="openCheck(row)">Diagnóstico</button>
               <RouterLink v-if="can('repro.write') && row.breeding && ['pending', 'pregnant'].includes(row.breeding.outcome)" class="panel-link" :to="{ name: 'birth-new', query: { madre: row.animalId } }">Parto</RouterLink>
-              <RouterLink v-else-if="can('repro.write')" class="panel-link" :to="{ name: 'breeding-new', query: { hembra: row.animalId } }">Montar</RouterLink>
+              <RouterLink v-else-if="can('repro.write')" class="panel-link" :to="{ name: 'empadre-new', query: { hembra: row.animalId } }">Empadrar</RouterLink>
               <RouterLink class="panel-link" :to="{ name: 'reproduction-history', query: { hembra: row.animalId } }">Historial</RouterLink>
             </div>
           </template>
@@ -201,7 +201,7 @@ onMounted(async () => {
 
     <UiDialog v-model="checkOpen" :title="`Diagnóstico de ${checkTarget?.visualTag ?? ''}`">
       <form id="rp-check-form" class="ui-form" novalidate @submit.prevent="saveCheck">
-        <p v-if="checkTarget?.breeding">Monta del {{ formatDate(checkTarget.breeding.matingDate) }} con {{ checkTarget.breeding.maleTag }}.</p>
+        <p v-if="checkTarget?.breeding">Empadre del {{ formatDate(checkTarget.breeding.startDate) }} con {{ checkTarget.breeding.maleTag }}.</p>
         <UiField v-model="checkForm.visitId" as="select" label="Visita del veterinario *" :options="visitOptions" />
         <p v-if="visitOptions.length === 1" class="panel-muted">
           No hay visitas después de la monta. <RouterLink class="panel-link" to="/panel/sanidad/visitas">Registrar visita</RouterLink>

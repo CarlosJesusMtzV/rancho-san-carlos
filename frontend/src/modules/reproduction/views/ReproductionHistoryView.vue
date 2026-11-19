@@ -33,7 +33,7 @@ const femaleOptions = computed(() => [
 const resultLabel = (result: string) => checkResultOptions.find((option) => option.value === result)?.label ?? result
 
 const breedingColumns = [
-  { key: 'matingDate' as const, label: 'Monta' },
+  { key: 'startDate' as const, label: 'Entró el semental' },
   { key: 'femaleTag' as const, label: 'Hembra' },
   { key: 'maleTag' as const, label: 'Semental' },
   { key: 'outcome' as const, label: 'Estado' },
@@ -67,7 +67,7 @@ async function remove(breeding: BreedingItem): Promise<void> {
   deletingId.value = breeding.id
   try {
     await deleteBreeding(breeding.id)
-    toast.value?.show(`Monta de ${breeding.femaleTag} del ${formatDate(breeding.matingDate)} eliminada.`)
+    toast.value?.show(`Empadre de ${breeding.femaleTag} del ${formatDate(breeding.startDate)} eliminado.`)
     await load()
   } catch (cause) {
     toast.value?.show(getApiErrorMessage(cause))
@@ -135,7 +135,7 @@ onMounted(async () => {
         <UiCard title="Montas" :description="`${breedings.length} registrada${breedings.length === 1 ? '' : 's'}`">
           <p v-if="breedings.length === 0" class="panel-muted">Sin montas registradas.</p>
           <UiTable v-else label="Montas" :columns="breedingColumns" :rows="breedings">
-            <template #cell-matingDate="{ row }">{{ formatDate(row.matingDate) }}</template>
+            <template #cell-startDate="{ row }">{{ formatDate(row.startDate) }}</template>
             <template #cell-femaleTag="{ row }"><RouterLink class="panel-link" :to="`/panel/hato/${row.femaleId}`">{{ row.femaleTag }}</RouterLink></template>
             <template #cell-maleTag="{ row }"><RouterLink class="panel-link" :to="`/panel/hato/${row.maleId}`">{{ row.maleTag }}</RouterLink></template>
             <template #cell-outcome="{ row }"><UiBadge :tone="outcomeTone(row.outcome)">{{ outcomeLabels[row.outcome] }}</UiBadge></template>
@@ -154,7 +154,7 @@ onMounted(async () => {
                 type="button"
                 class="panel-icon-button"
                 :disabled="deletingId !== null"
-                :aria-label="`Eliminar monta de ${row.femaleTag} del ${formatDate(row.matingDate)}`"
+                :aria-label="`Quitar a ${row.femaleTag} del empadre del ${formatDate(row.startDate)}`"
                 @click="remove(row)"
               >
                 Eliminar

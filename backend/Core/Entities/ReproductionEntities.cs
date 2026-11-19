@@ -1,16 +1,30 @@
 namespace TecNM.Api.Core.Entities;
 
-public sealed class BreedingEvent : AuditableEntity
+public sealed class BreedingSeason : AuditableEntity
 {
     public int Id { get; set; }
     public short SpeciesId { get; set; }
+    public int MaleId { get; set; }
+    public DateOnly StartDate { get; set; }
+    public string? Notes { get; set; }
+
+    public Animal Male { get; set; } = null!;
+    public List<BreedingEvent> Females { get; set; } = [];
+}
+
+public sealed class BreedingEvent : AuditableEntity
+{
+    public int Id { get; set; }
+    public int BreedingSeasonId { get; set; }
+    public short SpeciesId { get; set; }
     public int FemaleId { get; set; }
     public int MaleId { get; set; }
-    public DateOnly MatingDate { get; set; }
+    public DateOnly StartDate { get; set; }
     public DateOnly ExpectedDueDate { get; set; }
     public string Outcome { get; set; } = BreedingOutcomes.Pending;
     public string? Notes { get; set; }
 
+    public BreedingSeason Season { get; set; } = null!;
     public Animal Female { get; set; } = null!;
     public Animal Male { get; set; } = null!;
     public List<PregnancyCheck> Checks { get; set; } = [];

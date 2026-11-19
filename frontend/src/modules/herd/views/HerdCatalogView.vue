@@ -5,7 +5,7 @@ import { RouterLink } from 'vue-router'
 import { getApiErrorMessage } from '../../../shared/api/errors'
 import { can } from '../../../shared/auth/session'
 import { UiAlert, UiBasePage, UiButton, UiCard, UiField, UiLoadError, UiTable, UiToast } from '../../../shared/components'
-import { createBreed, createLot } from '../api/herdApi'
+import { createBreed } from '../api/herdApi'
 import SpeciesTag from '../components/SpeciesTag.vue'
 import { useCatalog } from '../composables/useCatalog'
 import type { SpeciesId } from '../types/herd'
@@ -18,13 +18,17 @@ const speciesOptions = [
   { value: '2', label: 'Caprino' },
 ]
 
+const purposeOptions = [
+  { value: '', label: 'Elige el propósito' },
+  { value: 'meat', label: 'Carne' },
+  { value: 'milk', label: 'Leche' },
+  { value: 'meat_milk', label: 'Carne-leche' },
+]
+const purposeLabels: Record<string, string> = { meat: 'Carne', milk: 'Leche', meat_milk: 'Carne-leche' }
+
 const breedForm = reactive({ speciesId: '1', name: '', purpose: '' })
 const breedError = ref('')
 const savingBreed = ref(false)
-
-const lotForm = reactive({ speciesId: '1', code: '', description: '' })
-const lotError = ref('')
-const savingLot = ref(false)
 
 const breedColumns = [
   { key: 'name' as const, label: 'Raza' },
@@ -32,10 +36,9 @@ const breedColumns = [
   { key: 'purpose' as const, label: 'Propósito' },
 ]
 const lotColumns = [
-  { key: 'code' as const, label: 'Lote' },
+  { key: 'description' as const, label: 'Situación' },
   { key: 'speciesId' as const, label: 'Especie' },
-  { key: 'description' as const, label: 'Descripción' },
-  { key: 'activeAnimals' as const, label: 'Animales activos' },
+  { key: 'activeAnimals' as const, label: 'Animales' },
 ]
 
 const breeds = computed(() => catalog.value?.breeds ?? [])
@@ -48,12 +51,16 @@ async function saveBreed(): Promise<void> {
     breedError.value = 'Escribe el nombre de la raza.'
     return
   }
+  if (!breedForm.purpose) {
+    breedError.value = 'Elige el propósito: carne, leche o carne-leche.'
+    return
+  }
   savingBreed.value = true
   try {
     const breed = await createBreed({
       speciesId: Number(breedForm.speciesId) as SpeciesId,
       name: breedForm.name.trim(),
-      purpose: breedForm.purpose.trim() || null,
+      purpose: breedForm.purpose,
     })
     breedForm.name = ''
     breedForm.purpose = ''
@@ -66,36 +73,11 @@ async function saveBreed(): Promise<void> {
   }
 }
 
-async function saveLot(): Promise<void> {
-  if (savingLot.value) return
-  lotError.value = ''
-  if (!lotForm.code.trim()) {
-    lotError.value = 'Escribe el código del lote.'
-    return
-  }
-  savingLot.value = true
-  try {
-    const lot = await createLot({
-      speciesId: Number(lotForm.speciesId) as SpeciesId,
-      code: lotForm.code.trim(),
-      description: lotForm.description.trim() || null,
-    })
-    lotForm.code = ''
-    lotForm.description = ''
-    await load()
-    toast.value?.show(`Lote ${lot.code} registrado.`)
-  } catch (cause) {
-    lotError.value = getApiErrorMessage(cause)
-  } finally {
-    savingLot.value = false
-  }
-}
-
 onMounted(load)
 </script>
 
 <template>
-  <UiBasePage fluid title="Razas y lotes" description="Catálogos del hato. Cada raza y cada lote pertenecen a una sola especie.">
+  <UiBasePage fluid title="Razas y situaciones" description="Catálogos del hato. Las situaciones son fijas; las razas se agregan con un propósito (carne, leche o carne-leche).">
     <template #actions>
       <div class="panel-toolbar">
         <RouterLink class="btn secondary" :to="{ name: 'herd' }">Volver al hato</RouterLink>
@@ -109,30 +91,23 @@ onMounted(load)
       <UiCard title="Razas">
         <form v-if="can('herd.write')" class="panel-form" novalidate @submit.prevent="saveBreed">
           <UiField v-model="breedForm.speciesId" as="select" label="Especie *" :options="speciesOptions" />
-          <UiField v-model="breedForm.name" label="Nombre *" maxlength="80" placeholder="Ej. Charolais, Alpina" required />
-          <UiField v-model="breedForm.purpose" label="Propósito" maxlength="120" placeholder="Ej. Carne, leche" />
+          <UiField v-model="breedForm.name" label="Nombre *" maxlength="80" placeholder="Ej. Limousin, Saanen" required />
+          <UiField v-model="breedForm.purpose" as="select" label="Propósito *" :options="purposeOptions" />
           <div class="panel-span"><UiButton type="submit" :loading="savingBreed">Agregar raza</UiButton></div>
         </form>
         <UiAlert v-if="breedError" tone="danger" title="No se registró">{{ breedError }}</UiAlert>
         <p v-if="breeds.length === 0" class="panel-muted">Aún no hay razas.</p>
         <UiTable v-else label="Razas registradas" :columns="breedColumns" :rows="breeds">
           <template #cell-speciesId="{ row }"><SpeciesTag :species-id="row.speciesId" /></template>
-          <template #cell-purpose="{ row }">{{ row.purpose ?? '—' }}</template>
+          <template #cell-purpose="{ row }">{{ row.purpose ? purposeLabels[row.purpose] ?? row.purpose : '—' }}</template>
         </UiTable>
       </UiCard>
 
-      <UiCard title="Lotes">
-        <form v-if="can('herd.write')" class="panel-form" novalidate @submit.prevent="saveLot">
-          <UiField v-model="lotForm.speciesId" as="select" label="Especie *" :options="speciesOptions" />
-          <UiField v-model="lotForm.code" label="Código *" maxlength="30" placeholder="Ej. BOV-DESTETE" hint="Se guarda en mayúsculas." required />
-          <UiField v-model="lotForm.description" label="Descripción" maxlength="255" />
-          <div class="panel-span"><UiButton type="submit" :loading="savingLot">Agregar lote</UiButton></div>
-        </form>
-        <UiAlert v-if="lotError" tone="danger" title="No se registró">{{ lotError }}</UiAlert>
-        <p v-if="lots.length === 0" class="panel-muted">Aún no hay lotes.</p>
-        <UiTable v-else label="Lotes registrados" :columns="lotColumns" :rows="lots">
+      <UiCard title="Situaciones">
+        <p class="panel-muted">Lista fija: cómo se maneja el animal ahora mismo. Se elige al dar de alta o editar un animal.</p>
+        <p v-if="lots.length === 0" class="panel-muted">Aún no hay situaciones.</p>
+        <UiTable v-else label="Situaciones" :columns="lotColumns" :rows="lots">
           <template #cell-speciesId="{ row }"><SpeciesTag :species-id="row.speciesId" /></template>
-          <template #cell-description="{ row }">{{ row.description ?? '—' }}</template>
         </UiTable>
       </UiCard>
     </div>

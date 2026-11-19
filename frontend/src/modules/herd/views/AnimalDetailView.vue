@@ -156,7 +156,7 @@ onMounted(async () => {
           <div><dt>Etapa</dt><dd>{{ stageLabel(animal.productionStage) }}</dd></div>
           <div><dt>Estado</dt><dd><LifecycleBadge :status="animal.lifecycleStatus" /></dd></div>
           <div><dt>Arete oficial</dt><dd>{{ animal.officialTag ?? '—' }}</dd></div>
-          <div><dt>Lote</dt><dd>{{ animal.lotCode ?? '—' }}</dd></div>
+          <div><dt>Situación</dt><dd>{{ animal.lotCode ?? '—' }}</dd></div>
           <div><dt>Nacimiento</dt><dd>{{ formatDate(animal.birthDate) }}</dd></div>
           <div><dt>Edad</dt><dd>{{ formatAge(animal.ageMonths) }}</dd></div>
           <div><dt>Origen</dt><dd>{{ originLabels[animal.origin] }}</dd></div>

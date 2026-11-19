@@ -17,7 +17,7 @@ Sistema de gestión del negocio familiar en Castaños, Coahuila. Sustituye por c
 | R2 | El bovino es únicamente para carne y se vende vivo: becerros de unos 8 meses y 150 kg. | `species.production_purpose`, `v_calf_sale_candidates` |
 | R3 | El caprino da cabritos y leche. Los cabritos se venden en pie o sacrificados y pelados (en canal). | `species.production_purpose`, `kid_slaughters` |
 | R4 | Solo se ordeñan cabras hembra. Canasta y panela son de leche de cabra propia; el asadero se compra hecho (leche de vaca) y no se elabora ni se presenta como propio. | `ck_milk_records_goats_only`, llave compuesta `(animal_id, species_id)`, `tg_milk_records_check` |
-| R5 | La raza y el lote de un animal son de su misma especie. | Llaves compuestas en `animals` |
+| R5 | La raza y la situación de un animal son de su misma especie. | Llaves compuestas en `animals` |
 | R6 | Toda tanda de queso proviene de la leche de un solo día, con una tanda por día y sin usar más litros de los ordeñados. | `cheese_batches.milk_lot_id NOT NULL`, `uq_cheese_batches_milk_lot_active`, `tg_cheese_batches_check`, `tg_milk_lots_cheese_check` |
 | R7 | Un animal vivo o una canal están en un solo pedido vigente (no cancelado). | `tg_order_items_check` |
 | R8 | Solo se sacrifican cabritos; nunca bovinos. Sin despiece: la canal se vende entera. | Llave compuesta y `ck_kid_slaughters_goats_only` |
@@ -53,12 +53,12 @@ El catálogo vive en `products` (`database.sql`) y, mientras no exista la API, s
 | --- | --- | --- | --- |
 | 1 | Hato | `species`, `breeds`, `animal_lots`, `animals`, `weight_records` | Ambas |
 | 2 | Sanidad | `vet_visits`, `health_events`, `treatments`, `lab_tests`, medicamentos en `supplies` | Ambas |
-| 3 | Reproducción | `breeding_events`, `pregnancy_checks`, `birth_events`, crías en `animals` | Ambas |
+| 3 | Reproducción | `breeding_seasons`, `breeding_events`, `pregnancy_checks`, `birth_events`, crías en `animals` | Ambas |
 | 4 | Ordeña | `milk_lots`, `milk_records` | Caprino |
 | 5 | Quesería | `products`, `cheese_batches`, `cheese_batch_outputs`, `cheese_purchases`, `cheese_stock_adjustments` | Caprino; asadero de proveedor |
 | 6 | Matanza de cabritos | `slaughter_runs`, `kid_slaughters` | Caprino |
 | 7 | Ventas | `customers`, `orders`, `order_items`, `invoices`, `payments` | Ambas |
-| Después | Insumos, compras, RH, equipo, finanzas | Ver `specs/database.spec.md` | — |
+| Después | Insumos, compras, RH, finanzas | Ver `specs/database.spec.md` | — |
 
 Cada módulo se construye como vertical slice con su propia spec en `backend/Modules/<Feature>/specs/` y `frontend/src/modules/<feature>/specs/`.
 
@@ -89,7 +89,7 @@ Reproducción, confirmado el 2026-11-11:
 
 | Decisión | Resultado |
 | --- | --- |
-| Método | Solo monta natural; sin inseminación. |
+| Método | Empadre: el semental con un grupo de hembras en agostadero; sin inseminación. La fecha es la entrada del semental y el parto probable es estimado. |
 | Crías | Se aretean y se dan de alta en el hato al registrar el parto. |
 | Preñez | La diagnostica el veterinario en sus visitas. |
 
@@ -142,13 +142,23 @@ Acceso y roles, confirmado el 2026-11-16:
 | Clientes | Sin cuenta: piden desde el sitio público si hay existencia y el administrador confirma (pendiente de construir). |
 | Empleados | Por ahora solo cuentas de acceso; sin puestos, nómina ni asistencia. |
 
+Hato y reproducción, confirmado el 2026-11-19:
+
+| Decisión | Resultado |
+| --- | --- |
+| Empadre en vez de monta | El ganado anda en agostadero y no se ve la monta. Se registra un empadre: un semental con un grupo de hembras y la fecha en que entró el semental; el parto probable es estimado (`breeding_seasons` + `breeding_events`). |
+| Diagnóstico y parto | Siguen siendo por hembra: cada hembra del empadre se diagnostica y pare por separado. |
+| Situación en vez de lote | El «lote» pasa a ser la situación de manejo del animal, con opciones fijas: bovino libre en agostadero / encerrada con becerro / cuidado especial; cabra con crías / sin crías / cuidado especial. |
+| Razas | Sembradas: bovino Limousin, Charbray, Simmental; cabra Saanen, Alpina, Toggenburg, Boer, Nubia. |
+| Propósito de la raza | Lista fija: carne, leche o carne-leche. Es descriptivo; no cambia que el bovino se vende en pie ni que solo la leche de cabra va a quesería. |
+
 Tomadas al diseñar (cambiables sin tocar la base):
 
 | Decisión | Valor |
 | --- | --- |
 | Gestación para la fecha probable de parto | Bovino 283 días; caprino 150 días |
 | Crías muertas al nacer | Solo se cuentan en el parto; no se dan de alta |
-| Raza y lote de la cría | Por omisión los de la madre; se pueden cambiar en el parto |
+| Raza y situación de la cría | Por omisión los de la madre; se pueden cambiar en el parto |
 | Venta que descuenta existencias | Renglones de pedidos confirmados o entregados |
 | Códigos de quesería | Tanda `QF-AAAAMMDD` (día de la ordeña); compra `CQ-AAAAMMDD` |
 | Canal disponible | Sin renglón en un pedido vigente (no cancelado) |
@@ -166,10 +176,10 @@ Pendientes:
 
 ## Aceptación
 
-1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 49 tablas, 7 vistas y 10 triggers en `snake_case`.
+1. `database.sql` se ejecuta sin errores en un PostgreSQL 15 vacío y crea 50 tablas, 7 vistas y 10 triggers en `snake_case`.
 2. Registrar ordeña de un bovino, de un macho o de una cabra con retiro de leche falla en la base de datos.
 3. Registrar la matanza de un bovino o de un cabrito con retiro de carne falla.
-4. Asignar a un animal una raza o lote de otra especie falla.
+4. Asignar a un animal una raza o situación de otra especie falla.
 5. Vender dos veces el mismo animal o la misma canal falla.
 6. El sitio público muestra los productos y presentaciones de `products` con los mismos precios.
 7. Ningún texto del sitio o del panel menciona alumnos, materias ni control escolar.

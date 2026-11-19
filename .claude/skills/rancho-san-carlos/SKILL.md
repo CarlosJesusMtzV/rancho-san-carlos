@@ -13,6 +13,7 @@ Antes de editar, leer `AGENTS.md` (raíz), el `AGENTS.md` del área afectada y `
 2. Los bovinos son únicamente para carne y se venden vivos: becerros de unos 8 meses y 150 kg (`v_calf_sale_candidates`). No se ordeñan ni se sacrifican.
 3. Los caprinos dan cabritos y leche. Los cabritos se venden en pie (`GAN-CAB`) o sacrificados y pelados, en canal (`CAB-CAN`, tabla `kid_slaughters`).
 4. Canasta y panela son el mismo queso (solo cambia el molde) y son exclusivamente de leche de cabra propia. El asadero se compra hecho a un proveedor, es de leche de vaca y solo se revende (`cheese_purchases`, tipo `resale`): nunca se presenta como propio ni de cabra. Solo se ordeñan cabras hembra sin retiro de leche (lo garantiza `tg_milk_records_check`).
+5bis. No hay monta: el ganado está en agostadero. La reproducción se registra como empadre (`breeding_seasons`): un semental con un grupo de hembras y la fecha en que entró el semental; el diagnóstico y el parto son por hembra. El «lote» es la situación de manejo del animal (opciones fijas, sembradas). El propósito de la raza es una lista fija: carne, leche o carne-leche.
 5. Cada tanda de queso (`cheese_batches`) usa la leche de un solo día (`milk_lots`), una tanda por día; esa cadena es la trazabilidad pública. Las existencias se calculan en `v_cheese_stock` y no pueden quedar negativas.
 6. No se sacrifica un cabrito con retiro de carne (lo garantiza `tg_kid_slaughters_check`). No hay despiece: la canal se vende entera.
 7. Un animal vendido, sacrificado, muerto o desechado deja de estar `active` y lleva `exit_date`.

@@ -47,9 +47,9 @@ public sealed class HerdService(TecNMDbContext db)
         }
 
         var purpose = HerdRules.Clean(request.Purpose);
-        if (purpose?.Length > 120)
+        if (purpose is not ("meat" or "milk" or "meat_milk"))
         {
-            throw ApiException.BadRequest("El propósito admite hasta 120 caracteres.");
+            throw ApiException.BadRequest("Elige el propósito: carne, leche o carne-leche.");
         }
 
         var lowered = name.ToLowerInvariant();

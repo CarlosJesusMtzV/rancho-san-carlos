@@ -165,15 +165,15 @@ onMounted(load)
           <UiField v-model="form.complications" label="Complicaciones" maxlength="255" />
         </div>
         <UiAlert v-if="dam && openBreeding" tone="info" title="Se liga a su monta">
-          Monta del {{ formatDate(openBreeding.matingDate) }} con {{ openBreeding.maleTag }}; parto probable {{ formatDate(openBreeding.expectedDueDate) }}.
+          Empadre del {{ formatDate(openBreeding.startDate) }} con {{ openBreeding.maleTag }}; parto probable {{ formatDate(openBreeding.expectedDueDate) }}.
           Las crías tendrán a {{ openBreeding.maleTag }} como padre.
         </UiAlert>
-        <UiAlert v-else-if="dam" tone="warning" title="Sin monta registrada">
-          {{ dam.visualTag }} no tiene una monta abierta: el parto se registra con padre desconocido.
+        <UiAlert v-else-if="dam" tone="warning" title="Sin empadre registrado">
+          {{ dam.visualTag }} no tiene un empadre abierto: el parto se registra con padre desconocido.
         </UiAlert>
       </UiCard>
 
-      <UiCard title="Crías vivas" :description="dam && damDetail ? `Por omisión: raza ${damDetail.breedName}${damDetail.lotCode ? `, lote ${damDetail.lotCode}` : ''}.` : undefined">
+      <UiCard title="Crías vivas" :description="dam && damDetail ? `Por omisión: raza ${damDetail.breedName}${damDetail.lotCode ? `, situación ${damDetail.lotCode}` : ''}.` : undefined">
         <div v-for="(row, index) in form.offspring" :key="row.key" class="rp-offspring">
           <UiField v-model="row.visualTag" :label="`Arete de la cría ${index + 1} *`" maxlength="30" autocomplete="off" />
           <UiField

@@ -67,7 +67,7 @@ const sexOptions = [
 
 const lotOptions = computed(() => [
   { value: '', label: 'Todos' },
-  ...lotsFor(filters.value.speciesId).map((lot) => ({ value: String(lot.id), label: lot.code })),
+  ...lotsFor(filters.value.speciesId).map((lot) => ({ value: String(lot.id), label: lot.description ?? lot.code })),
 ])
 
 const columns = [
@@ -77,7 +77,7 @@ const columns = [
   { key: 'sex' as const, label: 'Sexo' },
   { key: 'productionStage' as const, label: 'Etapa' },
   { key: 'ageMonths' as const, label: 'Edad' },
-  { key: 'lotCode' as const, label: 'Lote' },
+  { key: 'lotCode' as const, label: 'Situación' },
   { key: 'lastWeightKg' as const, label: 'Último peso' },
   { key: 'lifecycleStatus' as const, label: 'Estado' },
 ]
@@ -132,14 +132,14 @@ onMounted(() => {
       <div class="panel-toolbar">
         <RouterLink v-if="can('herd.write')" class="btn" :to="{ name: 'herd-new' }">Registrar animal</RouterLink>
         <RouterLink class="btn secondary" :to="{ name: 'herd-calves' }">Becerros para venta</RouterLink>
-        <RouterLink class="btn secondary" :to="{ name: 'herd-catalog' }">Razas y lotes</RouterLink>
+        <RouterLink class="btn secondary" :to="{ name: 'herd-catalog' }">Razas y situaciones</RouterLink>
       </div>
     </template>
 
     <div class="stack">
       <UiAlert v-if="catalog && !hasBreeds" tone="warning" title="Primero registra las razas">
         Para dar de alta animales necesitas al menos una raza por especie.
-        <RouterLink class="panel-link" :to="{ name: 'herd-catalog' }">Ir a razas y lotes</RouterLink>
+        <RouterLink class="panel-link" :to="{ name: 'herd-catalog' }">Ir a razas y situaciones</RouterLink>
       </UiAlert>
       <UiAlert v-if="catalogError" tone="warning" title="Catálogos no disponibles">{{ catalogError }}</UiAlert>
 
@@ -177,7 +177,7 @@ onMounted(() => {
           />
           <UiField
             as="select"
-            label="Lote"
+            label="Situación"
             :options="lotOptions"
             :model-value="filters.lotId ? String(filters.lotId) : ''"
             @update:model-value="setFilters({ lote: $event || undefined })"

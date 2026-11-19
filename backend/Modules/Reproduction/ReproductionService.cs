@@ -10,6 +10,7 @@ public sealed class ReproductionService(TecNMDbContext db)
 {
     private const int MaxOffspring = 6;
     private const int DueSoonDays = 30;
+    private const int MaxFemalesPerEmpadre = 200;
 
     /// <summary>Días de gestación usados para la fecha probable de parto.</summary>
     public static int GestationDays(short speciesId) => speciesId == Species.CattleId ? 283 : 150;
@@ -39,7 +40,7 @@ public sealed class ReproductionService(TecNMDbContext db)
                 animal.VisualTag,
                 animal.SpeciesId,
                 BreedName = animal.Breed.Name,
-                LotCode = animal.Lot != null ? animal.Lot.Code : null,
+                LotCode = animal.Lot != null ? animal.Lot.Description : null,
                 animal.BirthDate,
             })
             .ToListAsync(cancellationToken);
@@ -93,7 +94,51 @@ public sealed class ReproductionService(TecNMDbContext db)
         return result;
     }
 
-    // ------------------------------------------------------------------ Montas
+    // ------------------------------------------------------------------ Empadres
+
+    public async Task<IReadOnlyList<EmpadreItem>> ListEmpadresAsync(
+        short? speciesId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
+    {
+        if (from > to)
+        {
+            throw ApiException.BadRequest("La fecha inicial no puede ser posterior a la final.");
+        }
+
+        var seasons = db.BreedingSeasons.AsNoTracking().Include(season => season.Male).AsQueryable();
+        if (speciesId is { } species)
+        {
+            seasons = seasons.Where(season => season.SpeciesId == species);
+        }
+
+        if (from is { } start)
+        {
+            seasons = seasons.Where(season => season.StartDate >= start);
+        }
+
+        if (to is { } end)
+        {
+            seasons = seasons.Where(season => season.StartDate <= end);
+        }
+
+        var headers = await seasons
+            .OrderByDescending(season => season.StartDate).ThenByDescending(season => season.Id)
+            .ToListAsync(cancellationToken);
+
+        var seasonIds = headers.Select(season => season.Id).ToList();
+        var females = (await LoadBreedingsAsync(
+                db.BreedingEvents.Where(breeding => seasonIds.Contains(breeding.BreedingSeasonId)), cancellationToken))
+            .GroupBy(breeding => breeding.SeasonId)
+            .ToDictionary(group => group.Key, group => (IReadOnlyList<BreedingItem>)group.ToList());
+
+        return headers.Select(season => new EmpadreItem(
+                season.Id,
+                season.SpeciesId,
+                season.MaleId,
+                season.Male.VisualTag,
+                season.StartDate,
+                season.Notes,
+                females.GetValueOrDefault(season.Id, []))).ToList();
+    }
 
     public async Task<IReadOnlyList<BreedingItem>> ListBreedingsAsync(
         int? femaleId, string? outcome, DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
@@ -114,7 +159,7 @@ public sealed class ReproductionService(TecNMDbContext db)
             if (wanted is not (BreedingOutcomes.Pending or BreedingOutcomes.Pregnant or BreedingOutcomes.Open
                 or BreedingOutcomes.Aborted or BreedingOutcomes.Delivered))
             {
-                throw ApiException.BadRequest("El resultado de la monta no es válido.");
+                throw ApiException.BadRequest("El resultado del empadre no es válido.");
             }
 
             breedings = breedings.Where(breeding => breeding.Outcome == wanted);
@@ -122,102 +167,142 @@ public sealed class ReproductionService(TecNMDbContext db)
 
         if (from is { } start)
         {
-            breedings = breedings.Where(breeding => breeding.MatingDate >= start);
+            breedings = breedings.Where(breeding => breeding.StartDate >= start);
         }
 
         if (to is { } end)
         {
-            breedings = breedings.Where(breeding => breeding.MatingDate <= end);
+            breedings = breedings.Where(breeding => breeding.StartDate <= end);
         }
 
         return await LoadBreedingsAsync(breedings, cancellationToken);
     }
 
-    public async Task<BreedingItem> CreateBreedingAsync(CreateBreedingRequest request, CancellationToken cancellationToken)
+    public async Task<EmpadreItem> CreateEmpadreAsync(CreateEmpadreRequest request, CancellationToken cancellationToken)
     {
-        var matingDate = request.MatingDate ?? throw ApiException.BadRequest("Indica la fecha de la monta.");
+        var startDate = request.StartDate ?? throw ApiException.BadRequest("Indica cuándo entró el semental.");
+        var femaleIds = (request.FemaleIds ?? []).Distinct().ToList();
         var notes = TextInput.Clean(request.Notes);
         if (notes?.Length > 255)
         {
             throw ApiException.BadRequest("Las notas admiten hasta 255 caracteres.");
         }
 
-        if (request.FemaleId == request.MaleId)
+        if (femaleIds.Count == 0)
         {
-            throw ApiException.Unprocessable("Elige una hembra y un macho distintos.");
+            throw ApiException.BadRequest("Elige al menos una hembra para el empadre.");
         }
 
-        var pair = await db.Animals.AsNoTracking()
-            .Where(animal => animal.Id == request.FemaleId || animal.Id == request.MaleId)
+        if (femaleIds.Count > MaxFemalesPerEmpadre)
+        {
+            throw ApiException.BadRequest($"Un empadre admite hasta {MaxFemalesPerEmpadre} hembras.");
+        }
+
+        if (femaleIds.Contains(request.MaleId))
+        {
+            throw ApiException.Unprocessable("El semental no puede estar en la lista de hembras.");
+        }
+
+        if (startDate > RanchClock.Today)
+        {
+            throw ApiException.Unprocessable("La fecha de entrada del semental no puede ser futura.");
+        }
+
+        var male = await db.Animals.AsNoTracking()
+            .Where(animal => animal.Id == request.MaleId)
             .Select(animal => new { animal.Id, animal.VisualTag, animal.SpeciesId, animal.Sex, animal.LifecycleStatus, animal.BirthDate })
-            .ToListAsync(cancellationToken);
-        var female = pair.FirstOrDefault(animal => animal.Id == request.FemaleId) ?? throw ApiException.NotFound("La hembra no existe.");
-        var male = pair.FirstOrDefault(animal => animal.Id == request.MaleId) ?? throw ApiException.NotFound("El macho no existe.");
-
-        if (female.Sex != "F")
-        {
-            throw ApiException.Unprocessable($"{female.VisualTag} no es hembra.");
-        }
-
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw ApiException.NotFound("El semental no existe.");
         if (male.Sex != "M")
         {
             throw ApiException.Unprocessable($"{male.VisualTag} no es macho.");
         }
 
-        if (female.SpeciesId != male.SpeciesId)
+        if (male.LifecycleStatus != AnimalLifecycle.Active)
         {
-            throw ApiException.Unprocessable("La hembra y el macho deben ser de la misma especie.");
+            throw ApiException.Conflict($"{male.VisualTag} ya no está activo en el hato.");
         }
 
-        foreach (var animal in new[] { female, male })
+        if (male.BirthDate is { } maleBirth && startDate < maleBirth)
         {
-            if (animal.LifecycleStatus != AnimalLifecycle.Active)
-            {
-                throw ApiException.Conflict($"{animal.VisualTag} ya no está activo en el hato.");
-            }
-
-            if (animal.BirthDate is { } birth && matingDate < birth)
-            {
-                throw ApiException.Unprocessable($"La fecha de monta es anterior al nacimiento de {animal.VisualTag}.");
-            }
+            throw ApiException.Unprocessable($"La fecha es anterior al nacimiento de {male.VisualTag}.");
         }
 
-        if (matingDate > RanchClock.Today)
-        {
-            throw ApiException.Unprocessable("La fecha de monta no puede ser futura.");
-        }
+        var females = await db.Animals.AsNoTracking()
+            .Where(animal => femaleIds.Contains(animal.Id))
+            .Select(animal => new { animal.Id, animal.VisualTag, animal.SpeciesId, animal.Sex, animal.LifecycleStatus, animal.BirthDate })
+            .ToListAsync(cancellationToken);
 
-        var open = await db.BreedingEvents.AsNoTracking()
-            .Where(breeding => breeding.FemaleId == female.Id && BreedingOutcomes.InProgress.Contains(breeding.Outcome))
-            .Select(breeding => (DateOnly?)breeding.MatingDate)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (open is { } openDate)
-        {
-            throw ApiException.Conflict($"{female.VisualTag} ya tiene una monta del {openDate:dd/MM/yyyy} sin cerrar. Registra su diagnóstico o su parto primero.");
-        }
+        var openByFemale = (await db.BreedingEvents.AsNoTracking()
+                .Where(breeding => femaleIds.Contains(breeding.FemaleId) && BreedingOutcomes.InProgress.Contains(breeding.Outcome))
+                .Select(breeding => new { breeding.FemaleId, breeding.StartDate })
+                .ToListAsync(cancellationToken))
+            .GroupBy(breeding => breeding.FemaleId)
+            .ToDictionary(group => group.Key, group => group.Min(item => item.StartDate));
 
-        var breedingEvent = new BreedingEvent
+        var gestation = GestationDays(male.SpeciesId);
+        var season = new BreedingSeason
         {
-            SpeciesId = female.SpeciesId,
-            FemaleId = female.Id,
+            SpeciesId = male.SpeciesId,
             MaleId = male.Id,
-            MatingDate = matingDate,
-            ExpectedDueDate = matingDate.AddDays(GestationDays(female.SpeciesId)),
+            StartDate = startDate,
             Notes = notes,
         };
-        db.BreedingEvents.Add(breedingEvent);
+
+        foreach (var id in femaleIds)
+        {
+            var female = females.FirstOrDefault(animal => animal.Id == id)
+                ?? throw ApiException.NotFound($"La hembra {id} no existe.");
+            if (female.Sex != "F")
+            {
+                throw ApiException.Unprocessable($"{female.VisualTag} no es hembra.");
+            }
+
+            if (female.SpeciesId != male.SpeciesId)
+            {
+                throw ApiException.Unprocessable($"{female.VisualTag} no es de la misma especie que el semental.");
+            }
+
+            if (female.LifecycleStatus != AnimalLifecycle.Active)
+            {
+                throw ApiException.Conflict($"{female.VisualTag} ya no está activa en el hato.");
+            }
+
+            if (female.BirthDate is { } femaleBirth && startDate < femaleBirth)
+            {
+                throw ApiException.Unprocessable($"La fecha es anterior al nacimiento de {female.VisualTag}.");
+            }
+
+            if (openByFemale.TryGetValue(id, out var openDate))
+            {
+                throw ApiException.Conflict($"{female.VisualTag} ya tiene un empadre del {openDate:dd/MM/yyyy} sin cerrar. Registra su diagnóstico o su parto primero.");
+            }
+
+            season.Females.Add(new BreedingEvent
+            {
+                SpeciesId = male.SpeciesId,
+                FemaleId = female.Id,
+                MaleId = male.Id,
+                StartDate = startDate,
+                ExpectedDueDate = startDate.AddDays(gestation),
+                Notes = notes,
+            });
+        }
+
+        // El empadre y las participaciones de cada hembra se guardan juntos o nada.
+        db.BreedingSeasons.Add(season);
         await db.SaveChangesAsync(cancellationToken);
-        return await GetBreedingAsync(breedingEvent.Id, cancellationToken);
+        return await GetEmpadreAsync(season.Id, cancellationToken);
     }
 
     public async Task DeleteBreedingAsync(int id, CancellationToken cancellationToken)
     {
         var breeding = await db.BreedingEvents.Include(item => item.Checks)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken)
-            ?? throw ApiException.NotFound("La monta no existe.");
+            ?? throw ApiException.NotFound("La participación no existe.");
         if (breeding.Outcome != BreedingOutcomes.Pending || breeding.Checks.Count > 0)
         {
-            throw ApiException.Conflict("Solo se puede borrar una monta sin diagnóstico ni parto.");
+            throw ApiException.Conflict("Solo se puede quitar una hembra sin diagnóstico ni parto.");
         }
 
         breeding.DeletedAt = DateTime.UtcNow;
@@ -241,24 +326,24 @@ public sealed class ReproductionService(TecNMDbContext db)
 
         var breeding = await db.BreedingEvents.Include(item => item.Checks)
             .FirstOrDefaultAsync(item => item.Id == breedingId, cancellationToken)
-            ?? throw ApiException.NotFound("La monta no existe.");
+            ?? throw ApiException.NotFound("La participación no existe.");
         if (breeding.Outcome == BreedingOutcomes.Delivered)
         {
-            throw ApiException.Conflict("La monta ya terminó en parto.");
+            throw ApiException.Conflict("El empadre ya terminó en parto.");
         }
 
         var visitDate = await db.VetVisits.Where(visit => visit.Id == request.VetVisitId)
             .Select(visit => (DateOnly?)visit.VisitDate)
             .FirstOrDefaultAsync(cancellationToken)
             ?? throw ApiException.NotFound("La visita no existe.");
-        if (visitDate <= breeding.MatingDate)
+        if (visitDate <= breeding.StartDate)
         {
-            throw ApiException.Unprocessable($"La visita debe ser posterior a la monta del {breeding.MatingDate:dd/MM/yyyy}.");
+            throw ApiException.Unprocessable($"La visita debe ser posterior a la entrada del semental del {breeding.StartDate:dd/MM/yyyy}.");
         }
 
         if (breeding.Checks.Any(check => check.VetVisitId == request.VetVisitId))
         {
-            throw ApiException.Conflict("Esa visita ya tiene un diagnóstico para esta monta.");
+            throw ApiException.Conflict("Esa visita ya tiene un diagnóstico para esta hembra.");
         }
 
         breeding.Checks.Add(new PregnancyCheck
@@ -269,7 +354,7 @@ public sealed class ReproductionService(TecNMDbContext db)
             Notes = notes,
         });
 
-        // El estado de la monta es el del diagnóstico más reciente por fecha de visita;
+        // El estado es el del diagnóstico más reciente por fecha de visita;
         // si coinciden, gana el que se acaba de registrar (aún sin Id).
         var latest = breeding.Checks.MaxBy(check => (check.CheckDate, check.Id == 0 ? int.MaxValue : check.Id))!;
         breeding.Outcome = latest.Result;
@@ -345,11 +430,11 @@ public sealed class ReproductionService(TecNMDbContext db)
 
         var breeding = await db.BreedingEvents
             .Where(item => item.FemaleId == dam.Id && BreedingOutcomes.InProgress.Contains(item.Outcome))
-            .OrderByDescending(item => item.MatingDate)
+            .OrderByDescending(item => item.StartDate)
             .FirstOrDefaultAsync(cancellationToken);
-        if (breeding is not null && birthDate <= breeding.MatingDate)
+        if (breeding is not null && birthDate <= breeding.StartDate)
         {
-            throw ApiException.Unprocessable($"La fecha del parto debe ser posterior a la monta del {breeding.MatingDate:dd/MM/yyyy}.");
+            throw ApiException.Unprocessable($"La fecha del parto debe ser posterior a la entrada del semental del {breeding.StartDate:dd/MM/yyyy}.");
         }
 
         var birth = new BirthEvent
@@ -373,7 +458,7 @@ public sealed class ReproductionService(TecNMDbContext db)
             breeding.Outcome = BreedingOutcomes.Delivered;
         }
 
-        // Una sola llamada: el parto, las crías y la monta se guardan juntos o nada.
+        // Una sola llamada: el parto, las crías y la participación se guardan juntos o nada.
         db.BirthEvents.Add(birth);
         await db.SaveChangesAsync(cancellationToken);
         return (await LoadBirthsAsync(db.BirthEvents.Where(item => item.Id == birth.Id), cancellationToken)).Single();
@@ -425,7 +510,7 @@ public sealed class ReproductionService(TecNMDbContext db)
         var lotId = input.LotId ?? dam.LotId;
         if (input.LotId is not null && !await db.AnimalLots.AnyAsync(lot => lot.Id == lotId && lot.SpeciesId == dam.SpeciesId, cancellationToken))
         {
-            throw ApiException.Unprocessable($"{label}: el lote no corresponde a la especie de la madre.");
+            throw ApiException.Unprocessable($"{label}: la situación no corresponde a la especie de la madre.");
         }
 
         return new Animal
@@ -447,6 +532,9 @@ public sealed class ReproductionService(TecNMDbContext db)
 
     // ------------------------------------------------------------------ Lectura
 
+    private async Task<EmpadreItem> GetEmpadreAsync(int seasonId, CancellationToken cancellationToken) =>
+        (await ListEmpadresAsync(null, null, null, cancellationToken)).First(empadre => empadre.SeasonId == seasonId);
+
     private async Task<BreedingItem> GetBreedingAsync(int id, CancellationToken cancellationToken) =>
         (await LoadBreedingsAsync(db.BreedingEvents.Where(breeding => breeding.Id == id), cancellationToken)).Single();
 
@@ -456,7 +544,7 @@ public sealed class ReproductionService(TecNMDbContext db)
             .Include(breeding => breeding.Female)
             .Include(breeding => breeding.Male)
             .Include(breeding => breeding.Checks).ThenInclude(check => check.VetVisit)
-            .OrderByDescending(breeding => breeding.MatingDate).ThenByDescending(breeding => breeding.Id)
+            .OrderByDescending(breeding => breeding.StartDate).ThenByDescending(breeding => breeding.Id)
             .AsSplitQuery()
             .ToListAsync(cancellationToken);
 
@@ -467,12 +555,13 @@ public sealed class ReproductionService(TecNMDbContext db)
 
         return breedings.Select(breeding => new BreedingItem(
                 breeding.Id,
+                breeding.BreedingSeasonId,
                 breeding.SpeciesId,
                 breeding.FemaleId,
                 breeding.Female.VisualTag,
                 breeding.MaleId,
                 breeding.Male.VisualTag,
-                breeding.MatingDate,
+                breeding.StartDate,
                 breeding.ExpectedDueDate,
                 breeding.Outcome,
                 breeding.Notes,

@@ -2,9 +2,9 @@
 
 ## Alcance
 
-Registro de los animales del rancho, sus razas, lotes de manejo y pesajes. Es la base de todos los módulos siguientes: sanidad, reproducción, ordeña, matanza y ventas parten de un animal registrado aquí.
+Registro de los animales del rancho, sus razas, situaciones de manejo y pesajes. Es la base de todos los módulos siguientes: sanidad, reproducción, ordeña, matanza y ventas parten de un animal registrado aquí.
 
-- Catálogos: especies (fijas), razas y lotes por especie.
+- Catálogos: especies (fijas), razas (con propósito carne/leche/carne-leche) y situaciones por especie (lista fija).
 - Animales: alta, edición, consulta, filtros y salida del hato (vendido, muerto o desechado).
 - Pesajes: historial por animal.
 - Becerros para venta: consulta de `v_calf_sale_candidates`.
@@ -18,7 +18,7 @@ Fuera de alcance: autenticación (las columnas `created_by`, `updated_by` y `del
 | H1 | El arete visual es obligatorio, se guarda en mayúsculas sin espacios sobrantes y es único en todo el hato, incluidos animales que ya salieron. | 409 |
 | H2 | El arete oficial es opcional y único. | 409 |
 | H3 | La especie no cambia después del alta. | No editable |
-| H4 | La raza y el lote son de la misma especie que el animal. | 422 |
+| H4 | La raza y la situación son de la misma especie que el animal. | 422 |
 | H5 | El sexo es `M` o `F`. | 400 |
 | H6 | La fecha de nacimiento no es futura. | 422 |
 | H7 | La etapa productiva pertenece al catálogo de su especie y es compatible con el sexo (tabla de etapas). | 422 |
@@ -28,7 +28,7 @@ Fuera de alcance: autenticación (las columnas `created_by`, `updated_by` y `del
 | H11 | Un pesaje por animal y día. Registrar de nuevo una fecha eliminada la reactiva con los datos nuevos. | 409 |
 | H12 | El peso está entre 0.1 y 1500 kg. | 422 |
 | H13 | Las salidas permitidas aquí son `sold`, `dead` y `culled`. | 400 |
-| H14 | Raza única por especie; código de lote único. | 409 |
+| H14 | Raza única por especie (con propósito carne/leche/carne-leche); código de situación único. | 409 |
 
 Las reglas de base de datos (llaves compuestas, triggers) siguen aplicando; si una falla, la API responde con el mismo formato de error.
 

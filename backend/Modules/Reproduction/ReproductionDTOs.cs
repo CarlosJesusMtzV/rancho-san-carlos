@@ -4,24 +4,34 @@ public sealed record PregnancyCheckItem(int Id, int VetVisitId, string VetName, 
 
 public sealed record BreedingItem(
     int Id,
+    int SeasonId,
     short SpeciesId,
     int FemaleId,
     string FemaleTag,
     int MaleId,
     string MaleTag,
-    DateOnly MatingDate,
+    DateOnly StartDate,
     DateOnly ExpectedDueDate,
     string Outcome,
     string? Notes,
     IReadOnlyList<PregnancyCheckItem> Checks,
     int? BirthId);
 
+public sealed record EmpadreItem(
+    int SeasonId,
+    short SpeciesId,
+    int MaleId,
+    string MaleTag,
+    DateOnly StartDate,
+    string? Notes,
+    IReadOnlyList<BreedingItem> Females);
+
 public sealed record FemaleStatus(
     int AnimalId,
     string VisualTag,
     short SpeciesId,
     string BreedName,
-    string? LotCode,
+    string? Situation,
     int? AgeMonths,
     BreedingItem? Breeding,
     DateOnly? LastBirthDate,
@@ -43,7 +53,7 @@ public sealed record BirthItem(
     string? Complications,
     IReadOnlyList<OffspringItem> Offspring);
 
-public sealed record CreateBreedingRequest(int FemaleId, int MaleId, DateOnly? MatingDate, string? Notes);
+public sealed record CreateEmpadreRequest(int MaleId, IReadOnlyList<int>? FemaleIds, DateOnly? StartDate, string? Notes);
 
 public sealed record CreateCheckRequest(int VetVisitId, string? Result, string? Notes);
 

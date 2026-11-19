@@ -18,7 +18,7 @@ export interface BreedingItem {
   femaleTag: string
   maleId: number
   maleTag: string
-  matingDate: string
+  startDate: string
   expectedDueDate: string
   outcome: BreedingOutcome
   notes: string | null
@@ -26,12 +26,22 @@ export interface BreedingItem {
   birthId: number | null
 }
 
+export interface EmpadreItem {
+  seasonId: number
+  speciesId: 1 | 2
+  maleId: number
+  maleTag: string
+  startDate: string
+  notes: string | null
+  females: BreedingItem[]
+}
+
 export interface FemaleStatus {
   animalId: number
   visualTag: string
   speciesId: 1 | 2
   breedName: string
-  lotCode: string | null
+  situation: string | null
   ageMonths: number | null
   breeding: BreedingItem | null
   lastBirthDate: string | null

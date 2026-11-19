@@ -13,15 +13,21 @@ public sealed class ReproductionController(ReproductionService reproduction) : C
         reproduction.ListFemalesAsync(speciesId, status, cancellationToken);
 
     [RequirePermission(Permissions.ReproRead)]
+    [HttpGet("empadres")]
+    public Task<IReadOnlyList<EmpadreItem>> ListEmpadres(
+        [FromQuery] short? speciesId, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken cancellationToken) =>
+        reproduction.ListEmpadresAsync(speciesId, from, to, cancellationToken);
+
+    [RequirePermission(Permissions.ReproRead)]
     [HttpGet("breedings")]
     public Task<IReadOnlyList<BreedingItem>> ListBreedings(
         [FromQuery] int? femaleId, [FromQuery] string? outcome, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken cancellationToken) =>
         reproduction.ListBreedingsAsync(femaleId, outcome, from, to, cancellationToken);
 
     [RequirePermission(Permissions.ReproWrite)]
-    [HttpPost("breedings")]
-    public async Task<ActionResult<BreedingItem>> CreateBreeding(CreateBreedingRequest request, CancellationToken cancellationToken) =>
-        StatusCode(StatusCodes.Status201Created, await reproduction.CreateBreedingAsync(request, cancellationToken));
+    [HttpPost("empadres")]
+    public async Task<ActionResult<EmpadreItem>> CreateEmpadre(CreateEmpadreRequest request, CancellationToken cancellationToken) =>
+        StatusCode(StatusCodes.Status201Created, await reproduction.CreateEmpadreAsync(request, cancellationToken));
 
     [RequirePermission(Permissions.ReproDelete)]
     [HttpDelete("breedings/{id:int}")]

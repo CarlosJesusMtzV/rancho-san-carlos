@@ -28,7 +28,7 @@ export const sidebarNavigation: NavigationItem[] = [
     children: [
       { label: 'Animales', to: '/panel/hato' },
       { label: 'Becerros para venta', to: '/panel/hato/becerros' },
-      { label: 'Razas y lotes', to: '/panel/hato/catalogos' },
+      { label: 'Razas y situaciones', to: '/panel/hato/catalogos' },
     ],
   },
   {
@@ -46,7 +46,7 @@ export const sidebarNavigation: NavigationItem[] = [
     label: 'Reproducción',
     children: [
       { label: 'Hembras', to: '/panel/reproduccion' },
-      { label: 'Registrar monta', to: '/panel/reproduccion/montas/nueva' },
+      { label: 'Registrar empadre', to: '/panel/reproduccion/empadres/nuevo' },
       { label: 'Registrar parto', to: '/panel/reproduccion/partos/nuevo' },
       { label: 'Historial', to: '/panel/reproduccion/historial' },
     ],
